@@ -40,6 +40,10 @@ function AuthPage() {
 
   return (
     <div className="auth-page">
+      <div className="catchphrase-section">
+        <h2 className="catchphrase-title">"여행이 쉬워진다, AI와 함께라면."</h2>
+        <p className="catchphrase-subtitle">당신만의 맞춤 일정과 최고의 경로, 단 한 번의 클릭으로.</p>
+      </div>
       <div className="auth-form-container">
         <div className="logo-section">
            <div className="logo">
@@ -56,7 +60,7 @@ function AuthPage() {
         <form onSubmit={handleSubmit} className="form">
           {!isLogin && (
             <div className="input-group">
-              <label>Name</label>
+              <label>성함</label>
               <input
                 type="text"
                 name="name"
@@ -68,7 +72,7 @@ function AuthPage() {
           )}
           
           <div className="input-group">
-            <label>Email</label>
+            <label>이메일</label>
             <input
               type="email"
               name="email"
@@ -79,7 +83,7 @@ function AuthPage() {
           </div>
           
           <div className="input-group">
-            <label>Password</label>
+            <label>비밀번호</label>
             <input
               type="password"
               name="password"
@@ -91,7 +95,7 @@ function AuthPage() {
 
           {!isLogin && (
             <div className="input-group">
-              <label>Confirm Password</label>
+              <label>비밀번호 확인</label>
               <input
                 type="password"
                 name="confirmPassword"
