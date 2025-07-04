@@ -185,6 +185,19 @@
   }
 }
 
+.error-message {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: left; 
+  padding-left: 0.5rem; 
+}
+
+
+.input-group input.error {
+  border-color: #e74c3c;
+}
+
 /* 애니메이션 효과 */
 .auth-form-container {
   animation: fadeInLeft 0.8s ease-out;
@@ -225,6 +238,13 @@
 .catchphrase-subtitle {
   font-size: 1.0em;
   line-height: 1.7;
+}
+
+.main-page-link-section {
+  margin-top: 1.5rem; 
+  border-top: 1px solid #e0e0e0; /* 연한 회색 선 */
+  padding-top: 1.5rem; 
+  text-align: center; 
 }
 
 .input-group:nth-child(1) { animation-delay: 0.1s; }
