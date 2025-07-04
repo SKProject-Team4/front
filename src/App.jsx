@@ -1,43 +1,22 @@
-import { useState } from 'react'
-import AuthPage from './components/AuthPage'
-import HomePage from './components/HomePage'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // React Router 임포트
+import AuthPage from './page/AuthPage'; 
+import MainPage from './page/MainPage'; 
+import StartPlanningPage from './page/StartPlanningPage'; 
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('auth') // 'auth' 또는 'home'
-
-  const renderPage = () => {
-    switch(currentPage) {
-      case 'auth':
-        return <AuthPage />
-      case 'home':
-        return <HomePage />
-      default:
-        return <AuthPage />
-    }
-  }
-
   return (
-    <div className="app">
-      {/* 페이지 전환을 위한 간단한 네비게이션 (개발용) */}
-      <div className="nav-buttons">
-        <button 
-          onClick={() => setCurrentPage('auth')}
-          className={currentPage === 'auth' ? 'active' : ''}
-        >
-          로그인 페이지
-        </button>
-        <button 
-          onClick={() => setCurrentPage('home')}
-          className={currentPage === 'home' ? 'active' : ''}
-        >
-          홈 페이지
-        </button>
-      </div>
-      
-      {renderPage()}
-    </div>
-  )
+    <Router> {/* BrowserRouter로 전체 앱을 감싸야 합니다! */}
+      <Routes> {/* 모든 라우트 정의는 Routes 안에 있어야 합니다. */}
+        {/* 루트 경로 '/'는 AuthPage */}
+        <Route path="/" element={<AuthPage />} /> 
+        {/* '/main' 경로는 MainPage */}
+        <Route path="/main" element={<MainPage />} />
+        {/* '/start-planning-page' 경로는 StartPlanningPage */}
+        <Route path="/start-planning-page" element={<StartPlanningPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
