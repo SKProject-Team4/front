@@ -12,3 +12,4 @@ Currently, two official plugins are available:
 - npm install react-router-dom
 - npm install react-datepicker
 - npm install date-fns
+- npm install react@latest
