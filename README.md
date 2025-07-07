@@ -13,3 +13,12 @@ Currently, two official plugins are available:
 - npm install react-datepicker
 - npm install date-fns
 - npm install react@latest
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+- npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+-   이메일 = 'test@example.com';
+-   비밀번호 = 'password123';
+>>>>>>> jongwon
+>>>>>>> origin/jongwon

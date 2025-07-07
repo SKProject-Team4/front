@@ -15,7 +15,7 @@ function App() {
         {/* '/start-planning-page' 경로는 StartPlanningPage */}
         <Route path="/start-planning-page" element={<StartPlanningPage />} />
         {/* '/ai-chat' 경로는 AIChatPage */}
-        <Route path="/ai-chat" element={<AIChatPage />} />
+         <Route path="/ai-chat" element={<AIChatPage />} />
       </Routes>
     </Router>
   );

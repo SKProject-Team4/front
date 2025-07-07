@@ -1,99 +1,116 @@
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/sky_main.png'; // 배경 이미지
-import calendarIcon from '../assets/calendar.png'; // 왼쪽 아이콘
+// calendarIcon 임포트 제거됨
+import logoImage from '../assets/logo.png'; // 로고 이미지
+import './MainPage.css'; // CSS 파일 임포트
+
+// FullCalendar 관련 임포트
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid'; // 월별 보기 플러그인
+import timeGridPlugin from '@fullcalendar/timegrid'; // 주/일별 보기 플러그인
+import interactionPlugin from '@fullcalendar/interaction'; // 날짜 클릭, 드래그 등 상호작용 플러그인
+
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const handleClick = () => {
     navigate('/start-planning-page'); // 여행 계획 페이지로 이동
   };
 
+  const handleAuthClick = (e) => {
+    e.preventDefault();
+
+    if (isLoggedIn) {
+      localStorage.removeItem('userToken');
+      setIsLoggedIn(false);
+      alert('로그아웃 되었습니다.');
+      navigate('/'); // 로그인 페이지 경로
+    } else {
+      navigate('/'); // 로그인 페이지 경로
+    }
+  };
+
+  const handleMyPageClick = (e) => {
+    e.preventDefault();
+    navigate('/mypage'); // 마이페이지로 이동
+  };
+
+  const events = []; // 샘플 이벤트 데이터 (현재 비어있음)
+
   return (
     <div
+      className="main-page-container"
       style={{
         backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        color: '#333',
       }}
     >
-      {/* ⬆️ 상단 바 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: 'rgba(255,255,255,0.8)',
-          padding: '0 30px',
-          borderBottom: '1px solid #ccc',
-          height: '70px',
-          position: 'relative',
-        }}
-      >
-        {/* 왼쪽: 캘린더 아이콘 */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src={calendarIcon}
-            alt="캘린더 아이콘"
-            style={{ width: '40px', height: '40px' }}
-          />
-        </div>
+      {/* 상단 바 제거됨. 마이페이지/로그인 버튼만 별도로 배치 */}
+      <div className="top-right-buttons-container">
+        <button type="button" onClick={handleMyPageClick} className="top-bar-button">
+          마이페이지
+        </button>
+        <button type="button" onClick={handleAuthClick} className="top-bar-button">
+          {isLoggedIn ? '로그아웃' : '로그인'}
+        </button>
+      </div>
 
-        {/* 가운데: 로고 텍스트 */}
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontWeight: 'bold',
-            fontSize: '20px',
-          }}
-        >
-          로고
-        </div>
-
-        {/* 오른쪽: 로그인/로그아웃 */}
-        <div style={{ fontSize: '14px' }}>
-          <a href="login" style={{ textDecoration: 'none', color: '#333' }}>
-            로그인/회원가입
-          </a>
-        </div>
+      {/* 로고 이미지 컨테이너 */}
+      <div className="logo-container">
+        <img
+          src={logoImage}
+          alt="서비스 로고"
+          className="main-page-logo"
+        />
       </div>
 
       {/* ⬇️ 본문 내용 */}
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h1>AI 여행추천</h1>
+      <div className="main-content">
+        <p className="main-catchphrase-text title-text">"여행이 쉬워진다, AI와 함께라면."</p>
 
-        <div
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            margin: '20px auto',
-            padding: '20px',
-            width: '80%',
-            maxWidth: '500px',
-            borderRadius: '8px',
-          }}
-        >
-          <p>여행 스타일에 맞춘 맞춤 계획을 추천해드려요!</p>
-          <div style={{ marginTop: '20px' }}>
-            <span>🧳 ✈️ 🏝️</span>
-          </div>
+        {/* FullCalendar 삽입 */}
+        <div className="full-calendar-wrapper">
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }}
+            events={events}
+            editable={true}
+            selectable={true}
+            locale="ko"
+            height="auto"
+            dateClick={(info) => {
+              alert('날짜 클릭: ' + info.dateStr);
+            }}
+            eventClick={(info) => {
+              alert('이벤트 클릭: ' + info.event.title);
+            }}
+            eventDrop={(info) => {
+              console.log('이벤트 이동:', info.event.title, info.event.startStr);
+            }}
+          />
         </div>
+
+        <p className="main-catchphrase-text subtitle-text">당신만의 맞춤 일정과 최고의 경로, 단 한 번의 클릭으로.</p>
 
         <button
           onClick={handleClick}
-          style={{
-            backgroundColor: 'white',
-            padding: '12px 24px',
-            borderRadius: '10px',
-            border: '1px solid #ccc',
-            fontSize: '16px',
-            cursor: 'pointer',
-            boxShadow: '2px 2px 6px rgba(0,0,0,0.1)',
-            marginTop: '20px',
-          }}
+          className="plan-button"
         >
           여행 계획 세우기
         </button>
