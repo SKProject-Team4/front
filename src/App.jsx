@@ -1,8 +1,8 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // React Router 임포트
-import AuthPage from './page/AuthPage'; 
-import MainPage from './page/MainPage'; 
-import StartPlanningPage from './page/StartPlanningPage'; 
+import AuthPage from './pages/AuthPage'; 
+import MainPage from './pages/MainPage'; 
+import StartPlanningPage from './pages/StartPlanningPage'; 
+import AIChatPage from './pages/AIChatPage';
 
 function App() {
   return (
@@ -14,6 +14,8 @@ function App() {
         <Route path="/main" element={<MainPage />} />
         {/* '/start-planning-page' 경로는 StartPlanningPage */}
         <Route path="/start-planning-page" element={<StartPlanningPage />} />
+        {/* '/ai-chat' 경로는 AIChatPage */}
+        <Route path="/ai-chat" element={<AIChatPage />} />
       </Routes>
     </Router>
   );
