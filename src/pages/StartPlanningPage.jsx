@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // useNavigate는 jongwon 브랜치에서 추가됨
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import RegionModal from '../components/RegionModal';
 import calendarIcon from '../assets/calendar.png';
-import logo from '../assets/logo_2.png';
-import './StartPlanningPage.css';
+import logo from '../assets/logo_2.png'; // jongwon 브랜치에서 추가됨
+import './StartPlanningPage.css'; // jongwon 브랜치에서 추가됨
 
-const StartPlanningPage = () => {
+const StartPlanningPage = () => { // jongwon 브랜치에서 사용된 컴포넌트 이름
   const navigate = useNavigate();
 
   const [startDate, setStartDate] = useState(new Date());
@@ -18,6 +18,7 @@ const StartPlanningPage = () => {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [showRegionModal, setShowRegionModal] = useState(false);
 
+  // jongwon 브랜치에서 정의된 더 상세한 키워드 옵션을 사용합니다.
   const keywordOptions = [
     '혼자 떠나는 여행',
     '바닷가 감성 여행',
@@ -36,6 +37,7 @@ const StartPlanningPage = () => {
     );
   };
 
+  // handleSearch 함수는 AI Chat 페이지로 이동하는 jongwon 브랜치 로직을 사용합니다.
   const handleSearch = () => {
     const question = `지역: ${selectedRegion}\n교통: ${transport}\n날짜: ${startDate.toDateString()} ~ ${endDate.toDateString()}\n인원: ${people}명\n키워드: ${keywords.join(', ')}`;
     navigate('/ai-chat', {
@@ -49,7 +51,7 @@ const StartPlanningPage = () => {
       <div className="planning-header">
         <img src={calendarIcon} alt="캘린더" className="calendar-icon" />
         <img src={logo} alt="로고" className="planning-logo" />
-        <button className="login-button">로그인</button>
+        <button className="login-button">로그인</button> {/* 이 버튼은 기능 연결이 필요할 수 있습니다. */}
       </div>
 
       {/* 입력폼 */}

@@ -2,8 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // React Router 임포트
 import AuthPage from './pages/AuthPage'; 
 import MainPage from './pages/MainPage'; 
-import StartPlanningPage from './pages/StartPlanningPage';
+import StartPlanningPage from './pages/StartPlanningPage'; 
 import AIChatPage from './pages/AIChatPage'; 
+
 
 function App() {
   return (
