@@ -1,6 +1,6 @@
 /* 전체 배경 */
 .planning-wrapper {
-  background-image: url('../assets/beach-bg.jpg'); /* 이미지 경로에 맞게 수정 */
+  background-image: url('../assets/beach.png'); /* 이미지 경로에 맞게 수정 */
   background-size: cover;
   background-position: center;
   min-height: 100vh;
@@ -20,11 +20,8 @@
   justify-content: space-between;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
+.calendar-icon {
+  height: 32px;
 }
 
 .planning-logo {

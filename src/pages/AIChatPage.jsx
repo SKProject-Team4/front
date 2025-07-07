@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AIChatPage.css';
-import logo from '../assets/logo.png'; // ⬅️ 로고 이미지 추가!
+import logo from '../assets/logo_2.png'; // ⬅️ 로고 이미지 추가!
 
 const AIChatPage = () => {
   const navigate = useNavigate();

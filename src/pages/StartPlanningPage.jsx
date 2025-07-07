@@ -4,7 +4,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import RegionModal from '../components/RegionModal';
 import calendarIcon from '../assets/calendar.png';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo_2.png';
 import './StartPlanningPage.css';
 
 const StartPlanningPage = () => {
@@ -47,7 +47,7 @@ const StartPlanningPage = () => {
     <div className="planning-wrapper">
       {/* 상단바 */}
       <div className="planning-header">
-        <button className="back-button" onClick={() => navigate(-1)}>←</button>
+        <img src={calendarIcon} alt="캘린더" className="calendar-icon" />
         <img src={logo} alt="로고" className="planning-logo" />
         <button className="login-button">로그인</button>
       </div>
