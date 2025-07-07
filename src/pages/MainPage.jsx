@@ -56,8 +56,8 @@ const MainPage = () => {
 
         {/* 오른쪽: 로그인/로그아웃 */}
         <div style={{ fontSize: '14px' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>
-            로그인/로그아웃
+          <a href="login" style={{ textDecoration: 'none', color: '#333' }}>
+            로그인/회원가입
           </a>
         </div>
       </div>

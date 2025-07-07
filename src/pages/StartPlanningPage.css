@@ -15,6 +15,7 @@
 .planning-header {
   width: 100%;
   padding: 10px 20px;
+  margin-top: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,10 +23,6 @@
 
 .calendar-icon {
   height: 32px;
-}
-
-.planning-logo {
-  height: 50px;
 }
 
 .login-button {
@@ -44,7 +41,8 @@
   border-radius: 20px;
   width: 90%;
   max-width: 400px;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;

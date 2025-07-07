@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AIChatPage.css';
-import logo from '../assets/logo_2.png'; // ⬅️ 로고 이미지 추가!
+import Logo from "../components/Logo";
 
 const AIChatPage = () => {
   const navigate = useNavigate();
@@ -16,7 +16,9 @@ const AIChatPage = () => {
       {/* 헤더 */}
       <div className="chat-header">
         <button onClick={() => navigate(-1)} className="back-button">← 뒤로가기</button>
-        <img src={logo} alt="로고" className="logo-img" />
+        <div className="chat-title-center">
+            <Logo />
+        </div>
       </div>
 
       {/* 본문 */}

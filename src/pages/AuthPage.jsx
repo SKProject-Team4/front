@@ -126,7 +126,7 @@ function AuthPage() {
   };
 
   const goToMainPage = () => {
-    navigate('/main'); // React Router를 사용하여 '/main' 경로로 이동
+    navigate('/'); // React Router를 사용하여 '/main' 경로로 이동
   };
 
   return (
