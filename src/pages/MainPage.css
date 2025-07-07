@@ -79,7 +79,7 @@ html, body, #root, .main-page-container {
   font-size: 2.2em;
   font-weight: bold;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 50px;
   color: #2c3e50;
 }
 
@@ -155,8 +155,8 @@ html, body, #root, .main-page-container {
 /* 로고 */
 .logo-container {
   text-align: center;
-  margin-top: 20px; /* 기존 100px에서 축소 */
-  margin-bottom: 20px;
+  margin-top: 80px;  
+  margin-bottom: 40px;
   padding: 0 20px;
 }
 
