@@ -1,0 +1,214 @@
+/* MainPage.css */
+
+.main-page-container {
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  color: #333;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 0 30px;
+  border-bottom: 1px solid #ccc;
+  height: 70px;
+  position: relative;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+}
+
+.calendar-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.top-bar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.top-bar-right {
+  font-size: 14px;
+}
+
+.top-bar-link {
+  text-decoration: none;
+  color: #000000;
+}
+
+.main-content {
+  padding: 20px;
+  text-align: center;
+}
+
+.main-content .main-title {
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  color: #004d40;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.main-catchphrase-text {
+  color: #333;
+  line-height: 1.4;
+  margin: 0 auto;
+  max-width: 700px;
+  text-align: center;
+}
+
+.main-catchphrase-text.title-text {
+  font-size: 2.2em;
+  font-weight: bold;
+  margin-top: -10px;
+  margin-bottom: 60px;
+  color: #2c3e50;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.main-catchphrase-text.subtitle-text {
+  font-size: 1.2em;
+  margin-top: 0;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.plan-button {
+  background-color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.plan-button:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.plan-button:active {
+  transform: translateY(0);
+  background-color: #e0e0e0;
+}
+
+.full-calendar-wrapper {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.full-calendar-wrapper .fc .fc-toolbar-title {
+  color: #004d40;
+  font-weight: bold;
+}
+
+.full-calendar-wrapper .fc-daygrid-day {
+  background-color: #f8f8f8;
+}
+
+.full-calendar-wrapper .fc-day-today {
+  background-color: #e0f7fa !important;
+}
+
+.full-calendar-wrapper .fc-day-sat {
+  color: #007bff;
+}
+
+.full-calendar-wrapper .fc-day-sun {
+  color: #dc3545;
+}
+
+.full-calendar-wrapper .fc-event {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.logo-container {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.main-page-logo {
+  max-width: 300px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.2));
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0 15px;
+    height: 60px;
+  }
+
+  .calendar-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .top-bar-center {
+    font-size: 18px;
+  }
+
+  .top-bar-right {
+    font-size: 12px;
+  }
+
+  .main-content .main-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .main-catchphrase-text.title-text {
+    font-size: 1.5em;
+    margin-bottom: 15px; /* 모바일에서 간격 조절 */
+  }
+
+  .main-catchphrase-text.subtitle-text {
+    font-size: 1em;
+    margin-bottom: 30px;
+  }
+
+  .plan-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+
+  .full-calendar-wrapper .fc-daygrid-event,
+  .full-calendar-wrapper .fc-toolbar-title,
+  .full-calendar-wrapper .fc-button {
+      font-size: 0.9em;
+  }
+
+  .logo-container {
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+
+  .main-page-logo {
+    max-width: 200px;
+  }
+}

@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 import logo from '../assets/logo.png';
 
-// onGoToMain prop을 제거합니다.
-function AuthPage() { 
+function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -14,7 +13,7 @@ function AuthPage() {
   });
   const [emailError, setEmailError] = useState('');
 
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,10 +27,12 @@ function AuthPage() {
   };
 
   const validateEmail = async (email) => {
+    // 임시 테스트를 위해 이메일 중복 확인 API 호출은 주석 처리합니다.
+    // 실제 배포 시에는 주석을 해제하고 백엔드 API를 사용해야 합니다.
+    /*
     if (!email.includes('@') || !email.includes('.')) {
       return '유효한 이메일 형식이 아닙니다.';
     }
-
     try {
       const response = await fetch('/api/check-email-duplicate', {
         method: 'POST',
@@ -40,33 +41,46 @@ function AuthPage() {
         },
         body: JSON.stringify({ email: email }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         return errorData.message || '이메일 중복 확인 중 오류가 발생했습니다.';
       }
-
-      const data = await response.json(); 
-
+      const data = await response.json();
       if (data.isDuplicate) {
         return '이미 등록된 이메일입니다.';
       }
-
       return '';
     } catch (error) {
       console.error('이메일 중복 확인 네트워크 오류:', error);
       return '네트워크 오류로 이메일 중복 확인에 실패했습니다.';
     }
+    */
+    // 임시 테스트를 위해 항상 유효한 이메일로 간주합니다.
+    return '';
   };
 
-  const handleSubmit = async (e) => { 
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isLogin) {
       console.log('로그인 시도:', { email: formData.email, password: formData.password });
-      // 로그인 성공 시 MainPage로 이동 (예시)
-      // navigate('/main'); 
-    } else {
+
+      // ★★★ 임시 로그인 로직 시작 ★★★
+      const DUMMY_EMAIL = 'test@example.com';
+      const DUMMY_PASSWORD = 'password123';
+
+      if (formData.email === DUMMY_EMAIL && formData.password === DUMMY_PASSWORD) {
+        // 로그인 성공 시: localStorage에 더미 토큰 저장
+        localStorage.setItem('userToken', 'dummy-jwt-token-12345');
+        alert('로그인 성공! 메인 페이지로 이동합니다.');
+        navigate('/main'); // MainPage로 이동
+      } else {
+        // 로그인 실패 시
+        alert('로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다.\n(임시 계정: test@example.com / password123)');
+      }
+  
+
+    } else { // 회원가입 로직 (기존과 동일)
       const { name, email, password, confirmPassword } = formData;
 
       if (password !== confirmPassword) {
@@ -74,15 +88,18 @@ function AuthPage() {
         return;
       }
 
-      const error = await validateEmail(email);
+      const error = await validateEmail(email); // validateEmail은 위에서 임시로 작동하도록 수정됨
       if (error) {
         setEmailError(error);
         return;
       }
 
       console.log('회원가입 시도:', formData);
-      
+
       try {
+        // 임시 테스트를 위해 회원가입 API 호출은 주석 처리합니다.
+        // 실제 배포 시에는 주석을 해제하고 백엔드 API를 사용해야 합니다.
+        /*
         const registerResponse = await fetch('/api/register', {
           method: 'POST',
           headers: {
@@ -91,7 +108,7 @@ function AuthPage() {
           body: JSON.stringify({
             name: name,
             email: email,
-            password: password 
+            password: password
           }),
         });
 
@@ -100,13 +117,11 @@ function AuthPage() {
           alert('회원가입 실패: ' + (errorData.message || '알 수 없는 오류'));
           return;
         }
+        */
 
-        alert('회원가입이 성공적으로 완료되었습니다!');
-        setIsLogin(true); 
-        setFormData({ name: '', email: '', password: '', confirmPassword: '' }); 
-        // 회원가입 성공 후 MainPage로 이동 (선택 사항)
-        // navigate('/main'); 
-
+        alert('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
+        setIsLogin(true); // 회원가입 성공 후 로그인 모드로 전환
+        setFormData({ name: '', email: '', password: '', confirmPassword: '' });
       } catch (error) {
         console.error('회원가입 네트워크 오류:', error);
         alert('회원가입 중 네트워크 오류가 발생했습니다.');
@@ -137,7 +152,7 @@ function AuthPage() {
       </div>
       <div className="auth-form-container">
         <div className="logo-section">
-           <div className="logo">
+          <div className="logo">
             <img src={logo} alt="애플리케이션 로고" />
           </div>
           <h1 className="welcome-title">
@@ -161,7 +176,7 @@ function AuthPage() {
               />
             </div>
           )}
-          
+
           <div className="input-group">
             <label>이메일</label>
             <input
@@ -175,7 +190,7 @@ function AuthPage() {
               <p className="error-message">{emailError}</p>
             )}
           </div>
-          
+
           <div className="input-group">
             <label>비밀번호</label>
             <input

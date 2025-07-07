@@ -6,3 +6,13 @@ Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+
+- npm install react-scripts
+- npm install react-router-dom
+- npm install react-datepicker
+- npm install date-fns
+- npm install react@latest
+- npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
+-   이메일 = 'test@example.com';
+-   비밀번호 = 'password123';
