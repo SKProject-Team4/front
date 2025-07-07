@@ -1,0 +1,128 @@
+/* 전체 배경 */
+.planning-wrapper {
+  background-image: url('../assets/beach.png'); /* 이미지 경로에 맞게 수정 */
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 상단 헤더 */
+.planning-header {
+  width: 100%;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendar-icon {
+  height: 32px;
+}
+
+.planning-logo {
+  height: 50px;
+}
+
+.login-button {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* 입력 폼 영역 */
+.form-container {
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-container label {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.input-btn,
+.input-select,
+.input-field {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.date-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 키워드 입력 */
+.keyword-input .input-field {
+  background-color: #f8f8f8;
+}
+
+.keyword-title {
+  margin-top: 10px;
+  font-weight: bold;
+  background-color: #fff;
+  border: 2px solid #00bcd4;
+  padding: 5px 10px;
+  text-align: center;
+  border-radius: 20px;
+  color: #00bcd4;
+}
+
+/* 키워드 버튼 */
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.keyword-btn {
+  background-color: #fff;
+  border: 1px solid #aaa;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.keyword-btn.selected {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+}
+
+/* 검색 버튼 */
+.search-button {
+  margin-top: 20px;
+  background-color: #00bcd4;
+  color: white;
+  font-size: 18px;
+  padding: 12px 0;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 100%;
+}
