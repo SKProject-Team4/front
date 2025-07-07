@@ -10,27 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     "@fullcalendar/daygrid": "^6.1.18",
     "@fullcalendar/interaction": "^6.1.18",
     "@fullcalendar/react": "^6.1.18",
     "@fullcalendar/timegrid": "^6.1.18",
->>>>>>> origin/jongwon
-    "esbuild": "^0.25.5",
-    "react": "^18.3.1",
-    "react-datepicker": "^8.4.0",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.6.3"
-=======
     "date-fns": "^4.1.0",
+    "esbuild": "^0.25.5",
     "react": "^18.3.1",
     "react-datepicker": "^8.4.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.6.3",
     "react-scripts": "^5.0.1"
->>>>>>> dfeb5f8da367aa19b175da96b6d610d34a800232
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
