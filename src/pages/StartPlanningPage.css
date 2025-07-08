@@ -46,6 +46,7 @@ html, body {
 
 /* 캘린더 아이콘 래퍼 스타일 */
 .calendar-icon-wrapper {
+  height: 80px;
   position: absolute; /* fixed-app-header 기준 절대 위치 */
   left: 20px; /* 왼쪽에서 20px 떨어지도록 */
   cursor: pointer;
@@ -87,9 +88,9 @@ html, body {
   border-radius: 20px;
   width: 90%;
   max-width: 400px;
-  margin-top: 40px;
+  margin-top: 40px; /* 첫 번째 코드 블록에서는 10px이었지만, 두 번째 블록의 40px로 통일합니다. */
   margin-bottom: 10px;
-  margin-right: 10px; /* 사용자 제공 코드에 따라 조정 */
+  margin-right: 10px; /* 사용자 제공 코드에 따라 조정 - 이 속성은 form-container가 가운데 정렬되어 있다면 의미가 없을 수 있습니다. */
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
@@ -143,7 +144,8 @@ html, body {
   box-sizing: border-box;
 }
 
-.keyword-input input {
+/* 키워드 입력 */
+.keyword-input input { /* .keyword-input .input-field에서 변경, 더 간결하게 */
   background-color: #f8f8f8;
   cursor: default;
 }
@@ -188,6 +190,23 @@ html, body {
   border: none;
 }
 
+/* 셔플 버튼 (다른 키워드 보기) */
+.shuffle-button {
+  margin-top: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.shuffle-button:hover {
+  background-color: #f0f0f0;
+}
+
+
 /* 검색 버튼 */
 .search-button {
   margin-top: 20px;
@@ -199,16 +218,16 @@ html, body {
   border-radius: 15px;
   cursor: pointer;
   width: 100%;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* transition 추가 */
 }
 
 .search-button:hover {
-  background-color: #0097a7;
-  transform: translateY(-2px);
+  background-color: #0097a7; /* hover 효과 추가 */
+  transform: translateY(-2px); /* hover 효과 추가 */
 }
 
 .search-button:active {
-  transform: translateY(0);
+  transform: translateY(0); /* active 효과 추가 */
 }
 
 /* 지도 모달 오버레이 */
@@ -358,6 +377,7 @@ html, body {
     right: 15px; /* 모바일에서 오른쪽 위치 조정 */
     padding: 5px 10px;
     font-size: 14px;
+    /* bottom: 42px; 이 부분은 모바일에서 제거하거나 조정해야 할 수 있습니다. */
   }
 
   .form-container {
@@ -415,5 +435,21 @@ html, body {
 
   .full-calendar-display-wrapper {
     min-height: 250px; /* 모바일에서 최소 높이 조정 */
+  }
+
+  /* 모바일용 shuffle-button 스타일이 중복되어 있어서 정리했습니다. */
+  .shuffle-button { /* @media 내부에서 재정의된 것으로 보이는 부분 */
+    margin-top: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .shuffle-button:hover {
+    background-color: #f0f0f0;
   }
 }

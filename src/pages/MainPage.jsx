@@ -26,7 +26,7 @@ const MainPage = () => {
   }, []);
 
   const handleClick = () => {
-    navigate('/start-planning-page'); // 여행 계획 페이지로 이동
+    navigate('/start-planning'); // 여행 계획 페이지로 이동
   };
 
   const handleAuthClick = (e) => {

@@ -33,6 +33,7 @@ const AIChatPage = () => {
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [showPlaceSelector, setShowPlaceSelector] = useState(true);
   const [inputText, setInputText] = useState('');
+  const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
     const latestAI = messages.findLast((m) => m.role === 'ai');
@@ -77,11 +78,21 @@ const AIChatPage = () => {
     <div className="chat-wrapper">
       {/* 헤더 */}
       <div className="chat-header">
-        <button className="back-button" onClick={() => navigate(-1)}>←</button>
+        <button
+          className="back-button"
+          onClick={() => {
+            if (window.history.length > 2) {
+              navigate(-1);
+            } else {
+              navigate('/start-planning');
+            }
+          }}
+        >
+          ⬅︎
+        </button>
         <div className="chat-title-center">
           <Logo link="/" />
         </div>
-        <div className="header-placeholder" />
       </div>
 
       {/* 채팅 본문 */}
@@ -124,8 +135,26 @@ const AIChatPage = () => {
           placeholder="질문을 입력하세요..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
         />
-        <button onClick={handleSend}>전송하기</button>
+        <button className="chat-button" onClick={handleSend}>전송하기</button>
+
+        {/* 옵션 버튼 */}
+        <div className="options-wrapper">
+          <button className="options-button" onClick={() => setShowOptions((prev) => !prev)}>⋮</button>
+          {showOptions && (
+            <div className="options-dropdown">
+              <button>캘린더에 저장하기</button>
+              <button>PDF로 저장하기</button>
+              <button>JPG로 저장하기</button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

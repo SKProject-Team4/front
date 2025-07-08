@@ -1,55 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // useEffect 임포트 추가
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import RegionModal from '../components/RegionModal'; // RegionModal 임포트 유지
+import RegionModal from '../components/RegionModal';
 import calendarIcon from '../assets/calendar.png';
 import Logo from "../components/Logo";
 import './StartPlanningPage.css';
-import { MapPin } from 'lucide-react'; // 지도 마킹 아이콘 임포트
+import { MapPin } from 'lucide-react';
 
 // Leaflet 관련 임포트
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css'; // Leaflet 기본 CSS 임포트
+import 'leaflet/dist/leaflet.css';
 
-// Leaflet 마커 아이콘 설정 (기본 아이콘이 깨지는 문제 해결)
+// Leaflet 마커 아이콘 설정
 import L from 'leaflet';
-// 사용자 정의 마커 이미지 임포트 (예시: src/assets/myCustomMarker.png)
-// 실제 사용하실 이미지 경로로 변경해주세요.
 import customMarkerIconUrl from '../assets/logo_2.png'; 
 
 // FullCalendar 관련 임포트
 import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid'; // 월별 보기 플러그인
-import timeGridPlugin from '@fullcalendar/timegrid'; // 주/일별 보기 플러그인
-import interactionPlugin from '@fullcalendar/interaction'; // 날짜 클릭, 드래그 등 상호작용 플러그인
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 
-// 사용자 정의 마커 아이콘 정의
+// 사용자 정의 마커 아이콘 정의 (변경 없음)
 const CustomMarkerIcon = L.icon({
-  iconUrl: customMarkerIconUrl, // 사용자 정의 이미지 경로
-  iconRetinaUrl: customMarkerIconUrl, // 고해상도 디스플레이용 (동일 이미지 사용)
-  iconSize: [32, 32], // 아이콘 크기 (가로, 세로) - 이미지 크기에 맞게 조절
-  iconAnchor: [16, 32], // 아이콘의 어떤 부분이 마커 위치에 고정될지 (보통 이미지의 중앙 하단)
-  popupAnchor: [0, -32], // 팝업이 열릴 위치 (아이콘 앵커 기준)
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', // 그림자 이미지 (선택 사항)
-  shadowSize: [32, 32], // 그림자 크기
-  shadowAnchor: [16, 32] // 그림자 앵커
+  iconUrl: customMarkerIconUrl,
+  iconRetinaUrl: customMarkerIconUrl,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  shadowSize: [32, 32],
+  shadowAnchor: [16, 32]
 });
 
-// Leaflet의 모든 마커가 이 사용자 정의 아이콘을 기본으로 사용하도록 설정
+// Leaflet의 모든 마커가 이 사용자 정의 아이콘을 기본으로 사용하도록 설정 (변경 없음)
 L.Marker.prototype.options.icon = CustomMarkerIcon;
 
 
-// 지도 클릭 이벤트 핸들러 컴포넌트
+// 지도 클릭 이벤트 핸들러 컴포넌트 (변경 없음)
 const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
-  const [markerPosition, setMarkerPosition] = useState(null); // 클릭한 위치에 마커 표시
+  const [markerPosition, setMarkerPosition] = useState(null);
   const map = useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
-      setMarkerPosition([lat, lng]); // 클릭한 위치에 마커 설정
+      setMarkerPosition([lat, lng]);
 
-      // Nominatim 역지오코딩 API 호출
       const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
       try {
         const response = await fetch(nominatimUrl);
@@ -57,7 +54,6 @@ const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
 
         let address = "주소를 찾을 수 없습니다.";
         if (data && data.address) {
-          // 한국 주소 체계에 맞춰 적절히 조합 (Nominatim 응답 구조에 따라 다를 수 있음)
           const addr = data.address;
           address = [
             addr.country,
@@ -65,19 +61,19 @@ const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
             addr.city || addr.town || addr.village,
             addr.road,
             addr.house_number
-          ].filter(Boolean).join(' ').trim(); // null 또는 undefined 값 필터링
+          ].filter(Boolean).join(' ').trim();
           
-          if (!address) { // 더 일반적인 이름이 있다면 사용
+          if (!address) {
             address = data.display_name;
           }
         }
         
-        onSelectRegion(address); // 선택된 지역 상태 업데이트
-        onCloseMap(); // 지도 모달 닫기
+        onSelectRegion(address);
+        onCloseMap();
       } catch (error) {
         console.error("역지오코딩 오류:", error);
         alert("주소를 가져오는 데 실패했습니다. 다시 시도해주세요.");
-        onCloseMap(); // 오류 발생 시에도 지도 닫기
+        onCloseMap();
       }
     },
   });
@@ -94,11 +90,12 @@ const StartPlanningPage = () => {
   const [transport, setTransport] = useState('');
   const [keywords, setKeywords] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('');
-  const [showMap, setShowMap] = useState(false); // 지도 모달 표시 상태
-  const [showRegionModal, setShowRegionModal] = useState(false); // RegionModal 표시 상태 다시 활성화
-  const [showFullCalendarModal, setShowFullCalendarModal] = useState(false); // FullCalendar 모달 표시 상태 추가
+  const [showMap, setShowMap] = useState(false);
+  const [showRegionModal, setShowRegionModal] = useState(false);
+  const [showFullCalendarModal, setShowFullCalendarModal] = useState(false);
 
-  const keywordOptions = [
+  // 모든 키워드 옵션
+  const allKeywordOptions = [
     '혼자 떠나는 여행',
     '바닷가 감성 여행',
     '익사이팅한 액티비티 여행',
@@ -107,8 +104,28 @@ const StartPlanningPage = () => {
     '인생샷 명소 여행',
     '로컬 맛집 탐방',
     '계절 따라 떠나는 여행',
-    '힐링이 필요한 여행'
+    '힐링이 필요한 여행',
+    '반려동물과 함께하는 여행',
+    '역사 유적지 여행',
+    '트렌디한 도심 여행',
+    '문화 예술 감상 여행',
+    '야경 명소 탐방',
   ];
+
+  // 렌더링에 사용될 키워드 옵션을 관리하는 상태 추가
+  const [keywordOptions, setKeywordOptions] = useState([]); 
+
+  // 📍 랜덤 키워드 뽑기 함수
+  const shuffleKeywords = () => {
+    const shuffled = [...allKeywordOptions].sort(() => 0.5 - Math.random());
+    setKeywordOptions(shuffled.slice(0, 8)); // 8개만 선택하여 표시
+  };
+
+  // 컴포넌트 마운트 시 키워드 섞기
+  useEffect(() => {
+    shuffleKeywords();
+  }, []); // 빈 배열을 넣어 한 번만 실행되도록 설정
+
 
   const toggleKeyword = (word) => {
     setKeywords(prev =>
@@ -125,6 +142,9 @@ const StartPlanningPage = () => {
 
   // FullCalendar에 표시할 이벤트 (예시)
   const calendarEvents = [
+    // 여기에 실제 여행 일정을 추가할 수 있습니다.
+    // { title: '여행 시작', start: startDate.toISOString().split('T')[0] },
+    // { title: '여행 종료', end: endDate.toISOString().split('T')[0] }
   ];
 
   return (
@@ -139,10 +159,10 @@ const StartPlanningPage = () => {
         <Logo className="planning-logo" />
         {/* 로그인 버튼 */}
         <button
-            className="login-button"
-            onClick={() => navigate('/login')}
+          className="login-button"
+          onClick={() => navigate('/login')}
         >
-            로그인
+          로그인
         </button>
       </div>
 
@@ -154,7 +174,7 @@ const StartPlanningPage = () => {
             {/* 지도 아이콘 클릭 시 지도 모달 열기 */}
             <MapPin size={20} className="map-pin-icon" onClick={() => setShowMap(true)} style={{ cursor: 'pointer' }} />
         </div>
-        {/* 지역 선택 버튼 클릭 시 RegionModal 열기 (원래대로) */}
+        {/* 지역 선택 버튼 클릭 시 RegionModal 열기 */}
         <button onClick={() => setShowRegionModal(true)} className="input-btn">
           {selectedRegion || '지역 선택하기'}
         </button>
@@ -163,7 +183,12 @@ const StartPlanningPage = () => {
         <div className="date-picker-wrapper">
           <DatePicker
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={(date) => {
+              setStartDate(date);
+              if (date > endDate) {
+                setEndDate(date); // 시작일이 종료일보다 늦으면 종료일도 같이 변경
+              }
+            }}
             selectsStart
             startDate={startDate}
             endDate={endDate}
@@ -175,7 +200,7 @@ const StartPlanningPage = () => {
             selectsEnd
             startDate={startDate}
             endDate={endDate}
-            minDate={startDate}
+            minDate={startDate} // 시작일 이후만 선택 가능
           />
         </div>
 
@@ -188,13 +213,28 @@ const StartPlanningPage = () => {
           <option value="비행기">비행기</option>
         </select>
 
+        {/* 인원 라벨 중복 제거, 하나만 남김 */}
         <label>인원</label>
         <input
           type="number"
+          min="1"
+          step="1"
           value={people}
-          onChange={(e) => setPeople(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            if (value === '') {
+              setPeople('');
+              return;
+            }
+
+            const parsed = parseInt(value, 10);
+            if (!isNaN(parsed) && parsed >= 1) {
+              setPeople(parsed.toString());
+            }
+          }}
           className="input-field"
-          placeholder="2명"
+          placeholder="1명"
         />
 
         <label>키워드</label>
@@ -208,8 +248,9 @@ const StartPlanningPage = () => {
         </div>
 
         <div className="keyword-title">인기 키워드 ⭐</div>
+
         <div className="keyword-list">
-          {keywordOptions.map((word) => (
+          {keywordOptions.map((word) => ( // keywordOptions 상태 사용
             <button
               key={word}
               onClick={() => toggleKeyword(word)}
@@ -219,6 +260,10 @@ const StartPlanningPage = () => {
             </button>
           ))}
         </div>
+
+        <button className="shuffle-button" onClick={shuffleKeywords}>
+          🔄 다른 키워드 보기
+        </button>
 
         <button onClick={handleSearch} className="search-button">🔍검색</button>
       </div>
@@ -246,7 +291,7 @@ const StartPlanningPage = () => {
           onClose={() => setShowRegionModal(false)}
           onSelect={(region) => {
             setSelectedRegion(region);
-            setShowRegionModal(false); // 선택 후 모달 닫기
+            setShowRegionModal(false);
           }}
         />
       )}
@@ -266,12 +311,11 @@ const StartPlanningPage = () => {
                   center: 'title',
                   right: 'dayGridMonth'
                 }}
-                events={calendarEvents} // 위에 정의한 이벤트 사용
-                editable={false} // 이 달력은 보기 전용이므로 편집 비활성화
+                events={calendarEvents}
+                editable={false}
                 selectable={true}
                 locale="ko"
                 height="auto"
-                // 날짜 클릭 이벤트는 여기서는 주소 선택처럼 동작하지 않으므로, 정보 제공용으로만 사용
                 dateClick={(info) => {
                   alert('클릭한 날짜: ' + info.dateStr);
                 }}
