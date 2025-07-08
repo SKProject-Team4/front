@@ -36,9 +36,9 @@ const MainPage = () => {
       localStorage.removeItem('userToken');
       setIsLoggedIn(false);
       alert('로그아웃 되었습니다.');
-      navigate('/'); // 로그인 페이지 경로
+      navigate('/login'); // 로그인 페이지 경로
     } else {
-      navigate('/'); // 로그인 페이지 경로
+      navigate('/login'); // 로그인 페이지 경로
     }
   };
 
@@ -85,9 +85,9 @@ const MainPage = () => {
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+              left: 'prev,next today', // 이전/다음/오늘 버튼은 왼쪽에 유지
+              center: 'title', 
+              right: 'dayGridMonth' // 월별 보기 버튼은 오른쪽에 유지
             }}
             events={events}
             editable={true}

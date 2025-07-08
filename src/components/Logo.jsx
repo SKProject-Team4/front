@@ -9,7 +9,8 @@ const Logo = () => {
         alt="로고"
         style={{
           height: "40px", // 높이 조절
-          cursor: "pointer", // 손모양 커서
+          cursor: "pointer"
+          , // 손모양 커서
         }}
       />
     </Link>

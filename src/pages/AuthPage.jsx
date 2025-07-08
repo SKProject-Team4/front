@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './AuthPage.css';
 import logo from '../assets/logo.png';
 
@@ -153,7 +154,9 @@ function AuthPage() {
       <div className="auth-form-container">
         <div className="logo-section">
           <div className="logo">
-            <img src={logo} alt="애플리케이션 로고" />
+            <Link to="/">
+              <img src={logo} alt="애플리케이션 로고" />
+            </Link>
           </div>
           <h1 className="welcome-title">
             {isLogin ? '안녕하세요!' : '회원 가입'}

@@ -115,7 +115,19 @@ const RegionModal = ({ onClose, onSelect }) => {
 
         {/* 하단 버튼 */}
         <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button onClick={onClose}>취소</button>
+          <button 
+            onClick={onClose}
+            style={{
+              backgroundColor: '#00bcd4',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            취소
+          </button>
           <button
             onClick={handleComplete}
             style={{
