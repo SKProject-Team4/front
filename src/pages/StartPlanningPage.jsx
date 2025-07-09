@@ -17,11 +17,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import customMarkerIconUrl from '../assets/logo_2.png'; 
 
-// FullCalendar 관련 임포트 제거됨 (Calendar 컴포넌트 내부로 이동)
-// import FullCalendar from '@fullcalendar/react';
-// import dayGridPlugin from '@fullcalendar/dayGrid';
-// import timeGridPlugin from '@fullcalendar/timegrid';
-// import interactionPlugin from '@fullcalendar/interaction';
 
 
 // 사용자 정의 마커 아이콘 정의 (변경 없음)

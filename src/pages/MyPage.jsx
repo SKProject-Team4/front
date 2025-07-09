@@ -1,56 +1,102 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// beachBackgroundImage 임포트 제거됨
 import './MyPage.css'; // MyPage 전용 CSS 파일 임포트
+import axios from 'axios'; // axios 임포트
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [originalEmail, setOriginalEmail] = useState(''); // 초기 이메일 저장을 위한 상태
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const [emailError, setEmailError] = useState(''); // 이메일 중복 오류 메시지
+
+  // 🚨 백엔드 API의 기본 URL을 여기에 설정해주세요!
+  const API_BASE_URL = 'http://localhost:8080'; // 예시: 실제 백엔드 URL로 변경하세요.
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // 실제 환경에서는 여기서 사용자 토큰을 이용해 API를 호출하여 사용자 정보를 가져옵니다.
-      // 예시를 위해 더미 데이터를 사용합니다.
-      // const token = localStorage.getItem('userToken');
-      // if (!token) {
-      //   alert('로그인이 필요합니다.');
-      //   navigate('/login');
-      //   return;
-      // }
+      const token = localStorage.getItem('userToken');
+
+      if (!token || token === 'guest-planning-key-12345') { // 토큰이 없거나 게스트 키인 경우
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        navigate('/login');
+        return;
+      }
 
       try {
-        // 실제 API 호출 (예시)
-        // const response = await fetch('/api/user/profile', {
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`
-        //   }
-        // });
-        // if (!response.ok) {
-        //   throw new Error('사용자 정보를 가져오지 못했습니다.');
-        // }
-        // const data = await response.json();
+        console.log('마이페이지: 사용자 정보 로딩을 위한 로그인 체크 API 호출 시도');
+        // GET /users/logincheck API 호출
+        const response = await axios.get(`${API_BASE_URL}/users/logincheck`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-        // 더미 데이터 (기존 사용자 정보로 가정)
-        const data = {
-          name: '김유저',
-          email: 'user@example.com',
-        };
-        setName(data.name);
-        setEmail(data.email);
-        setIsLoading(false); // 데이터 로딩 완료
+        // API 명세에 따르면 'users' 상태일 때 로그인된 사용자
+        if (response.data.status === 'users' && response.data.code === 200 && response.data.login === true) {
+          // ★★★ 백엔드 응답에서 이름(username)과 이메일을 가져와야 함 ★★★
+          // 가정: logincheck 응답에 user 정보가 포함되거나, 별도의 프로필 조회 API가 있다고 가정
+          // 현재 logincheck 명세에는 username, email 필드가 없으므로, 백엔드와 협의 필요
+          // 여기서는 임시로 응답에 user: { username, email }이 있다고 가정합니다.
+          // 만약 응답에 이 정보가 없다면 별도의 GET /users/profile 같은 API가 필요합니다.
+          const userData = response.data.user || { username: '불러오기 실패', email: '불러오기 실패' }; // 임시 더미 데이터
+
+          setName(userData.username); // 'username' 필드를 'name'으로 사용
+          setEmail(userData.email);
+          setOriginalEmail(userData.email); // 초기 이메일 저장
+          setIsLoading(false);
+          console.log('마이페이지: 사용자 정보 로딩 성공', userData);
+        } else {
+          alert('로그인 상태를 확인할 수 없습니다. 다시 로그인해주세요.');
+          localStorage.removeItem('userToken'); // 유효하지 않은 토큰 제거
+          navigate('/login');
+        }
       } catch (error) {
-        console.error('Failed to fetch user data:', error);
+        console.error('마이페이지: 사용자 정보 로딩 실패:', error);
         alert('사용자 정보를 불러오는 데 실패했습니다.');
-        navigate('/'); // 에러 발생 시 메인 페이지로 이동
+        localStorage.removeItem('userToken'); // 오류 시 토큰 제거
+        navigate('/login'); // 에러 발생 시 로그인 페이지로 이동
       }
     };
 
     fetchUserData();
   }, [navigate]);
+
+  // 이메일 중복 확인 함수 (AuthPage의 validateEmail 재활용)
+  const validateEmail = async (checkEmail) => {
+    if (!checkEmail.includes('@') || !checkEmail.includes('.')) {
+      return '유효한 이메일 형식이 아닙니다.';
+    }
+
+    try {
+      console.log('마이페이지: 이메일 중복 확인 API 호출 시도:', `${API_BASE_URL}/users/check_username?email=${checkEmail}`); //
+      const response = await axios.get(`${API_BASE_URL}/users/check_username`, { //
+        params: { email: checkEmail },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.status === 'success' && response.data.code === 200) { //
+        return ''; // 사용 가능한 아이디
+      } else if (response.data.status === 'error' && response.data.message === '이미 사용 중인 아이디입니다.') { //
+        return '이미 등록된 이메일입니다.'; // 중복됨
+      } else {
+        console.error('마이페이지: 이메일 중복 확인 실패 응답:', response.data);
+        return '이메일 중복 확인 중 알 수 없는 오류가 발생했습니다.';
+      }
+    } catch (error) {
+      console.error('마이페이지: 이메일 중복 확인 API 호출 오류:', error);
+      if (error.response && error.response.data.message === '이미 사용 중인 아이디입니다.') { //
+        return '이미 등록된 이메일입니다.';
+      }
+      return '이메일 중복 확인 중 네트워크 오류 또는 서버 오류가 발생했습니다.';
+    }
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -60,31 +106,66 @@ const MyPage = () => {
       return;
     }
 
-    // 여기에 사용자 정보를 업데이트하는 API 호출 로직을 추가합니다.
+    // 이메일 변경 시에만 중복 체크 수행
+    if (email !== originalEmail) {
+      const error = await validateEmail(email);
+      if (error) {
+        setEmailError(error);
+        alert(error); // 사용자에게 알림
+        return;
+      }
+      setEmailError(''); // 에러가 없으면 초기화
+    }
+
+    const token = localStorage.getItem('userToken');
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+
     try {
-      // 실제 API 호출 (예시)
-      // const token = localStorage.getItem('userToken');
-      // const response = await fetch('/api/user/update-profile', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${token}`
-      //   },
-      //   body: JSON.stringify({ name, email, password: password || undefined }) // 비밀번호는 입력했을 때만 전송
-      // });
+      // ★★★ 사용자 정보 업데이트 API (가정: PUT /users/edit_info) ★★★
+      // 이 부분은 백엔드 API 명세에 맞춰 변경해야 합니다.
+      // username은 name 상태 변수를, email은 email 상태 변수를 사용합니다.
+      // password는 입력된 경우에만 전송합니다.
+      const updatePayload = {
+        username: name,
+        email: email,
+      };
+      if (password) { // 비밀번호 필드가 비어있지 않은 경우에만 추가
+        updatePayload.password = password;
+      }
 
-      // if (!response.ok) {
-      //   throw new Error('프로필 업데이트에 실패했습니다.');
-      // }
+      console.log('마이페이지: 사용자 정보 업데이트 API 호출 시도:', `${API_BASE_URL}/users/edit_info`, updatePayload);
+      const response = await axios.put(`${API_BASE_URL}/users/edit_info`, updatePayload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      alert('회원 정보가 성공적으로 업데이트되었습니다!');
-      // 업데이트 후 필요하다면 다시 로그인하거나, 페이지를 새로고침할 수 있습니다.
-      // navigate('/mypage'); // 현재 페이지를 다시 로드하거나
-      // 또는:
-      // navigate('/'); // 메인 페이지로 이동
+      // 가상의 응답 처리: 백엔드 응답에 따라 조건 변경 필요
+      if (response.data.status === 'success' && response.data.code === 200) {
+        alert('회원 정보가 성공적으로 업데이트되었습니다!');
+        setOriginalEmail(email); // 이메일 변경이 성공하면 originalEmail 업데이트
+        setPassword(''); // 비밀번호 초기화
+        setConfirmPassword(''); // 비밀번호 확인 초기화
+        // navigate('/mypage'); // 필요하다면 페이지 리로드 또는 이동
+      } else {
+        alert('회원 정보 업데이트에 실패했습니다: ' + (response.data.message || '알 수 없는 오류'));
+        console.error('마이페이지: 회원 정보 업데이트 실패 응답:', response.data);
+      }
     } catch (error) {
-      console.error('Profile update failed:', error);
-      alert('회원 정보 업데이트에 실패했습니다.');
+      console.error('마이페이지: 프로필 업데이트 실패:', error);
+      if (error.response) {
+        alert('회원 정보 업데이트 중 서버 오류가 발생했습니다: ' + (error.response.data.message || '알 수 없는 오류'));
+        console.error('마이페이지: 서버 응답 오류:', error.response.data);
+      } else if (error.request) {
+        alert('회원 정보 업데이트 중 네트워크 오류가 발생했습니다. 서버 연결을 확인해주세요.');
+      } else {
+        alert('회원 정보 업데이트 중 예상치 못한 오류가 발생했습니다.');
+      }
     }
   };
 
@@ -94,7 +175,6 @@ const MyPage = () => {
 
   if (isLoading) {
     return (
-      // style 속성 제거
       <div className="mypage-container">
         <div className="top-right-buttons-container">
           <button type="button" onClick={handleGoToMain} className="top-bar-button">
@@ -109,7 +189,6 @@ const MyPage = () => {
   }
 
   return (
-    // style 속성 제거
     <div className="mypage-container">
       {/* 상단 메인 페이지 버튼 */}
       <div className="top-right-buttons-container">
@@ -140,6 +219,7 @@ const MyPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {emailError && <p className="error-message">{emailError}</p>}
           </div>
           <div className="form-group">
             <label htmlFor="password">새 비밀번호 (변경 시 입력)</label>
