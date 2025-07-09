@@ -134,7 +134,11 @@ const StartPlanningPage = () => {
   };
 
   const handleSearch = () => {
-    const question = `지역: ${selectedRegion}\n교통: ${transport}\n날짜: ${startDate.toDateString()} ~ ${endDate.toDateString()}\n인원: ${people}명\n키워드: ${keywords.join(', ')}`;
+    const formatDate = (date) => {
+      return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+    };
+
+    const question = `${formatDate(startDate)}부터 ${formatDate(endDate)}까지 ${people || '여러'}명이 ${selectedRegion || '어딘가'}로 ${transport || '알맞은 교통수단으로'} 여행을 가려고 해. ${keywords.length > 0 ? `${keywords.join(', ')} 같은 키워드에 맞는 장소` : '좋은 여행지'}를 추천해줄래?`;
     navigate('/ai-chat', {
       state: { question }
     });

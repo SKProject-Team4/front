@@ -3,6 +3,7 @@ import AuthPage from './pages/AuthPage';
 import MainPage from './pages/MainPage'; 
 import StartPlanningPage from './pages/StartPlanningPage'; 
 import AIChatPage from './pages/AIChatPage';
+import MyPage from './pages/MyPage'; // MyPage 컴포넌트 임포트
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
         {/* '/start-planning-page' 경로는 StartPlanningPage */}
         <Route path="/start-planning" element={<StartPlanningPage />} />
         {/* '/ai-chat' 경로는 AIChatPage */}
-         <Route path="/ai-chat" element={<AIChatPage />} />
+        <Route path="/ai-chat" element={<AIChatPage />} />
+        {/* '/mypage' 경로는 MyPage 추가 */}
+        <Route path="/mypage" element={<MyPage />} /> 
       </Routes>
     </Router>
   );

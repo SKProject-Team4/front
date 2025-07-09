@@ -42,10 +42,10 @@ const MainPage = () => {
     }
   };
 
-  const handleMyPageClick = (e) => {
-    e.preventDefault();
-    navigate('/mypage'); // 마이페이지로 이동
-  };
+const handleMyPageClick = (e) => {
+  e.preventDefault();
+  navigate('/mypage'); // 마이페이지로 이동
+};
 
   const events = []; // 샘플 이벤트 데이터 (현재 비어있음)
 
@@ -59,7 +59,7 @@ const MainPage = () => {
       {/* 상단 바 제거됨. 마이페이지/로그인 버튼만 별도로 배치 */}
       <div className="top-right-buttons-container">
         <button type="button" onClick={handleMyPageClick} className="top-bar-button">
-          마이페이지
+        마이페이지
         </button>
         <button type="button" onClick={handleAuthClick} className="top-bar-button">
           {isLoggedIn ? '로그아웃' : '로그인'}
