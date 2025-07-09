@@ -1,9 +1,27 @@
 .chat-wrapper {
-  background-color: #D4F6FF;
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Noto Sans KR', sans-serif;
+  height: 100vh;
+  background-image: url('../assets/beach_2.png'); /* 경로 주의! */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: brightness(0.95); /* 필요하면 배경 어둡게 조정 */
+}
+
+/* ✅ 흰색 박스: 채팅 본문 + 입력창 감싸는 박스 */
+.chat-content-box {
+  flex-grow: 1;
+  margin: 20px auto;
+  margin-top: 45px;
+  width: 90%;
+  max-width: 1000px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* 상단 헤더 */
@@ -12,37 +30,38 @@
   height: 70px;
   display: flex;
   align-items: center;
-  justify-content: center; /* 가운데 정렬로 변경 */
+  justify-content: center;
   padding: 10px 20px;
-  position: relative; /* 버튼 위치 고정에 필요 */
-  background-color: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid #ccc;
+  position: relative;
+  background-color: transparent;
+  border-bottom: none
 }
 
 /* 뒤로가기 버튼 */
 .back-button {
   position: absolute;
   left: 20px;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
   background: none;
   border: none;
   font-size: 30px;
   color: #555;
   cursor: pointer;
-  z-index: 10; /* 겹침 방지 */
+  z-index: 10;
 }
 
 /* 로고 중앙 정렬 */
 .chat-title-center {
   flex: 1;
+  margin-top: 35px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-left: -42px;
 }
 
-/* 채팅 내용 스크롤 영역 */
+/* 채팅 내용 */
 .chat-body {
   flex-grow: 1;
   overflow-y: auto;
@@ -50,6 +69,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background-color: white;
 }
 
 /* 말풍선 공통 */
@@ -60,7 +80,7 @@
   line-height: 1.5;
   white-space: pre-line;
   word-break: break-word;
-  font-size: 15px;
+  font-size: 17px;
 }
 
 /* 사용자 말풍선 */
@@ -79,7 +99,7 @@
   margin-left: 10px;
 }
 
-/* 장소 선택 컨테이너 */
+/* 장소 선택 영역 */
 .place-selection {
   margin-top: 10px;
   background-color: #ffffff88;
@@ -97,7 +117,6 @@
   margin-top: 12px;
 }
 
-/* 장소 버튼 */
 .place-button {
   padding: 8px 14px;
   border-radius: 20px;
@@ -105,7 +124,7 @@
   background-color: white;
   color: #00bcd4;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 0.2s ease-in-out;
 }
 
@@ -115,7 +134,6 @@
   color: white;
 }
 
-/* 완료 버튼 */
 .complete-button {
   margin-top: 16px;
   padding: 10px 20px;
@@ -124,7 +142,7 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   transition: 0.2s;
 }
 
@@ -132,14 +150,13 @@
   background-color: #43a047;
 }
 
-/* 키워드 타이틀 */
 .keyword-title {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 600;
   color: #333;
 }
 
-/* 하단 입력창 */
+/* 입력창 */
 .chat-input {
   border-top: 1px solid #ccc;
   background-color: #fff;
@@ -153,6 +170,7 @@
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 17px;
 }
 
 .chat-button {
@@ -162,17 +180,10 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 17px;
 }
 
-/* ✅ 애니메이션 효과 */
-.fade-in {
-  animation: fadeIn 0.4s ease-in-out forwards;
-}
-
-.fade-out {
-  animation: fadeOut 0.4s ease-in-out forwards;
-}
-
+/* 옵션 버튼 */
 .options-wrapper {
   position: relative;
   display: flex;
@@ -180,10 +191,13 @@
 }
 
 .options-button {
-  background: none;
+  padding: 10px 10px;
+  background-color: #4f626981;
+  color: #fff;
   border: none;
-  font-size: 20px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .options-dropdown {
@@ -196,7 +210,7 @@
   padding: 6px 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 999;
-  min-width: 150px; /* ✅ 줄바꿈을 위한 넉넉한 너비 */
+  min-width: 200px;
 }
 
 .options-dropdown button {
@@ -206,13 +220,22 @@
   padding: 10px 8px;
   text-align: center;
   cursor: pointer;
-  font-size: 14px;
-  white-space: pre-line; /* ✅ 줄바꿈 허용 */
+  font-size: 17px;
+  white-space: pre-line;
   line-height: 1.2;
 }
 
 .options-dropdown button:hover {
   background-color: #f0f0f0;
+}
+
+/* 애니메이션 */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 0.4s ease-in-out forwards;
 }
 
 @keyframes fadeIn {

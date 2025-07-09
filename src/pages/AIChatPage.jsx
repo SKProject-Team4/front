@@ -1,5 +1,5 @@
 // AIChatPage.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AIChatPage.css';
 import Logo from "../components/Logo";
@@ -34,6 +34,16 @@ const AIChatPage = () => {
   const [showPlaceSelector, setShowPlaceSelector] = useState(true);
   const [inputText, setInputText] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+
+  // ✅ 스크롤용 ref
+  const scrollRef = useRef(null);
+
+  // ✅ 메시지 업데이트 시 맨 아래로 스크롤
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   useEffect(() => {
     const latestAI = messages.findLast((m) => m.role === 'ai');
@@ -76,7 +86,7 @@ const AIChatPage = () => {
 
   return (
     <div className="chat-wrapper">
-      {/* 헤더 */}
+      {/* 헤더 - 그대로 유지! */}
       <div className="chat-header">
         <button
           className="back-button"
@@ -95,65 +105,70 @@ const AIChatPage = () => {
         </div>
       </div>
 
-      {/* 채팅 본문 */}
-      <div className="chat-body">
-        {messages.map((msg, index) => (
-          <div key={index} className={`chat-bubble ${msg.role} fade-in`}>
-            {msg.text}
-          </div>
-        ))}
-
-        {places.length > 0 && showPlaceSelector && (
-          <div className="place-selection fade-in">
-            <div className="keyword-title">🗺️ 가고 싶은 장소를 골라줘!</div>
-            <div className="place-buttons">
-              {places.map((place) => (
-                <button
-                  key={place}
-                  onClick={() =>
-                    setSelectedPlaces((prev) =>
-                      prev.includes(place)
-                        ? prev.filter((p) => p !== place)
-                        : [...prev, place]
-                    )
-                  }
-                  className={`place-button ${selectedPlaces.includes(place) ? 'selected' : ''}`}
-                >
-                  {place}
-                </button>
-              ))}
+      {/* ✅ 흰색 박스 채팅 컨텐츠 부분 시작 */}
+      <div className="chat-content-box">
+        {/* 채팅 본문 */}
+        <div className="chat-body">
+          {messages.map((msg, index) => (
+            <div key={index} className={`chat-bubble ${msg.role} fade-in`}>
+              {msg.text}
             </div>
-            <button className="complete-button" onClick={handleComplete}>✅ 완료</button>
-          </div>
-        )}
-      </div>
+          ))}
 
-      {/* 입력창 */}
-      <div className="chat-input">
-        <input
-          type="text"
-          placeholder="질문을 입력하세요..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-        />
-        <button className="chat-button" onClick={handleSend}>전송하기</button>
-
-        {/* 옵션 버튼 */}
-        <div className="options-wrapper">
-          <button className="options-button" onClick={() => setShowOptions((prev) => !prev)}>⋮</button>
-          {showOptions && (
-            <div className="options-dropdown">
-              <button>캘린더에 저장하기</button>
-              <button>PDF로 저장하기</button>
-              <button>JPG로 저장하기</button>
+          {places.length > 0 && showPlaceSelector && (
+            <div className="place-selection fade-in">
+              <div className="keyword-title">🗺️ 가고 싶은 장소를 골라줘!</div>
+              <div className="place-buttons">
+                {places.map((place) => (
+                  <button
+                    key={place}
+                    onClick={() =>
+                      setSelectedPlaces((prev) =>
+                        prev.includes(place)
+                          ? prev.filter((p) => p !== place)
+                          : [...prev, place]
+                      )
+                    }
+                    className={`place-button ${selectedPlaces.includes(place) ? 'selected' : ''}`}
+                  >
+                    {place}
+                  </button>
+                ))}
+              </div>
+              <button className="complete-button" onClick={handleComplete}>✅ 완료</button>
             </div>
           )}
+
+          {/* ✅ 스크롤 포커스용 div */}
+          <div ref={scrollRef} />
+        </div>
+
+        {/* 입력창 */}
+        <div className="chat-input">
+          <input
+            type="text"
+            placeholder="질문을 입력하세요..."
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+          <button className="chat-button" onClick={handleSend}>전송하기</button>
+
+          <div className="options-wrapper">
+            <button className="options-button" onClick={() => setShowOptions((prev) => !prev)}>⋮</button>
+            {showOptions && (
+              <div className="options-dropdown">
+                <button>캘린더에 저장하기</button>
+                <button>PDF로 저장하기</button>
+                <button>JPG로 저장하기</button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
