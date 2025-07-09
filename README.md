@@ -13,6 +13,7 @@ Currently, two official plugins are available:
 - npm install react-datepicker
 - npm install date-fns
 - npm install react@latest
+- npm install react-toastify
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
