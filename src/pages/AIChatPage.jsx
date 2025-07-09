@@ -1,16 +1,16 @@
-// AIChatPage.jsx
 import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AIChatPage.css';
 import Logo from "../components/Logo";
+import CustomAlert from "../components/CustomAlert"; // 💡 알림창 컴포넌트 임포트
 
-// 장소 추출 함수
+// 장소 추출
 const extractPlaces = (text) => {
   const regex = /어린이대공원|뚝섬한강공원|서울숲|세종대학교 벚꽃길|건대입구 커먼그라운드/g;
   return text.match(regex) || [];
 };
 
-// 임시 AI 응답 생성 함수
+// AI 응답 시뮬레이션
 const getRouteFromAI = async (selectedPlaces) => {
   const list = selectedPlaces.join(" → ");
   return `✨ 선택하신 장소를 기반으로 추천 코스를 알려드릴게요!\n\n${list} 도보 코스는 하루 일정으로 적당해요! 중간중간 휴식 장소도 추천드려요 ☕`;
@@ -28,17 +28,16 @@ const AIChatPage = () => {
     { role: 'user', text: initialQuestion },
     { role: 'ai', text: initialAnswer }
   ]);
-
   const [places, setPlaces] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [showPlaceSelector, setShowPlaceSelector] = useState(true);
   const [inputText, setInputText] = useState('');
   const [showOptions, setShowOptions] = useState(false);
-
-  // ✅ 스크롤용 ref
   const scrollRef = useRef(null);
 
-  // ✅ 메시지 업데이트 시 맨 아래로 스크롤
+  // 커스텀 알림창
+  const [alertMessage, setAlertMessage] = useState('');
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -53,9 +52,13 @@ const AIChatPage = () => {
     }
   }, [messages]);
 
+  const isLoggedInUser = (() => {
+    const token = localStorage.getItem('userToken');
+    return token && token !== 'guest-planning-key-12345';
+  })();
+
   const handleComplete = async () => {
     if (selectedPlaces.length === 0) return;
-
     const placeText = selectedPlaces.join(', ');
     const question = `${placeText} 으로 도보 여행 코스 추천해줘`;
     const answer = await getRouteFromAI(selectedPlaces);
@@ -68,12 +71,11 @@ const AIChatPage = () => {
 
     setPlaces([]);
     setSelectedPlaces([]);
-    setShowPlaceSelector(false); // 선택창 비활성화
+    setShowPlaceSelector(false);
   };
 
   const handleSend = () => {
     if (!inputText.trim()) return;
-
     const userMsg = { role: 'user', text: inputText };
     const aiMsg = {
       role: 'ai',
@@ -84,9 +86,34 @@ const AIChatPage = () => {
     setInputText('');
   };
 
+  const handleSaveToCalendar = () => {
+    if (!isLoggedInUser) {
+      setAlertMessage('로그인이 필요해요! 😿');
+      return;
+    }
+
+    setAlertMessage('캘린더에 저장했어요! 🗓️');
+
+    // 백엔드 연동 예정
+    /*
+    const token = localStorage.getItem('userToken');
+    await axios.post('/api/calendar/save', { messages }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    */
+  };
+
+  const handleSaveAsPDF = () => {
+    setAlertMessage('PDF로 저장했어요! 📝 (기능 추가 예정)');
+  };
+
+  const handleSaveAsJPG = () => {
+    setAlertMessage('JPG로 저장했어요! 🖼️ (기능 추가 예정)');
+  };
+
   return (
     <div className="chat-wrapper">
-      {/* 헤더 - 그대로 유지! */}
+      {/* 상단 헤더 */}
       <div className="chat-header">
         <button
           className="back-button"
@@ -105,9 +132,8 @@ const AIChatPage = () => {
         </div>
       </div>
 
-      {/* ✅ 흰색 박스 채팅 컨텐츠 부분 시작 */}
+      {/* 본문 */}
       <div className="chat-content-box">
-        {/* 채팅 본문 */}
         <div className="chat-body">
           {messages.map((msg, index) => (
             <div key={index} className={`chat-bubble ${msg.role} fade-in`}>
@@ -139,11 +165,10 @@ const AIChatPage = () => {
             </div>
           )}
 
-          {/* ✅ 스크롤 포커스용 div */}
           <div ref={scrollRef} />
         </div>
 
-        {/* 입력창 */}
+        {/* 입력창 + 옵션 */}
         <div className="chat-input">
           <input
             type="text"
@@ -163,14 +188,22 @@ const AIChatPage = () => {
             <button className="options-button" onClick={() => setShowOptions((prev) => !prev)}>⋮</button>
             {showOptions && (
               <div className="options-dropdown">
-                <button>캘린더에 저장하기</button>
-                <button>PDF로 저장하기</button>
-                <button>JPG로 저장하기</button>
+                <button onClick={handleSaveToCalendar}>캘린더에 저장하기</button>
+                <button onClick={handleSaveAsPDF}>PDF로 저장하기</button>
+                <button onClick={handleSaveAsJPG}>JPG로 저장하기</button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* 💡 커스텀 알림창 */}
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage('')}
+        />
+      )}
     </div>
   );
 };
