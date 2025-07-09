@@ -162,6 +162,17 @@ function AuthPage() {
     }
   };
 
+  // ★★★ 임시 로그인 함수 추가 ★★★
+  const handleTempLogin = () => {
+    // 실제 JWT 토큰이 아닌, 임시 값을 사용합니다.
+    // 백엔드에서 유효한 토큰을 받아오거나, 임시로 설정한 토큰으로 대체하세요.
+    const tempToken = 'YOUR_TEMPORARY_JWT_TOKEN_HERE_FOR_DEVELOPMENT_ONLY';
+    localStorage.setItem('userToken', tempToken);
+    alert('임시 로그인 성공! 메인 페이지로 이동합니다.');
+    navigate('/');
+  };
+  // ★★★ 임시 로그인 함수 추가 끝 ★★★
+
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setFormData({
@@ -250,6 +261,14 @@ function AuthPage() {
             {isLogin ? '로그인' : '회원가입'}
           </button>
         </form>
+
+        {/* ★★★ 임시 로그인 버튼 추가 ★★★ */}
+        {isLogin && (
+          <button type="button" onClick={handleTempLogin} className="temp-login-btn">
+            임시 로그인 (개발용)
+          </button>
+        )}
+        {/* ★★★ 임시 로그인 버튼 추가 끝 ★★★ */}
 
         <div className="toggle-section">
           <p>

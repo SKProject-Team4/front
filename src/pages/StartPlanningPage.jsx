@@ -8,18 +8,17 @@ import Logo from "../components/Logo";
 import Calendar from '../components/Calendar'; // ★★★ Calendar 컴포넌트 임포트 ★★★
 import './StartPlanningPage.css';
 import { MapPin } from 'lucide-react';
+import moment from 'moment'; // moment.js 임포트 (Calendar 컴포넌트와 동일하게)
 
-// Leaflet 관련 임포트
+
+// Leaflet 관련 임포트 (기존과 동일)
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Leaflet 마커 아이콘 설정
+// Leaflet 마커 아이콘 설정 (기존과 동일)
 import L from 'leaflet';
 import customMarkerIconUrl from '../assets/logo_2.png'; 
 
-
-
-// 사용자 정의 마커 아이콘 정의 (변경 없음)
 const CustomMarkerIcon = L.icon({
   iconUrl: customMarkerIconUrl,
   iconRetinaUrl: customMarkerIconUrl,
@@ -31,11 +30,10 @@ const CustomMarkerIcon = L.icon({
   shadowAnchor: [16, 32]
 });
 
-// Leaflet의 모든 마커가 이 사용자 정의 아이콘을 기본으로 사용하도록 설정 (변경 없음)
 L.Marker.prototype.options.icon = CustomMarkerIcon;
 
 
-// 지도 클릭 이벤트 핸들러 컴포넌트 (변경 없음)
+// 지도 클릭 이벤트 핸들러 컴포넌트 (기존과 동일)
 const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
   const [markerPosition, setMarkerPosition] = useState(null);
   const map = useMapEvents({
@@ -124,7 +122,6 @@ const StartPlanningPage = () => {
   useEffect(() => {
     shuffleKeywords();
 
-    // 페이지 로드 시 localStorage에 토큰이 있는지 확인하여 실제 로그인 상태 초기화
     const token = localStorage.getItem('userToken');
     // 'guest-planning-key-12345'는 실제 로그인으로 간주하지 않음
     if (token && token !== 'guest-planning-key-12345') {
@@ -132,8 +129,7 @@ const StartPlanningPage = () => {
     } else {
       setIsLoggedInUser(false);
     }
-  }, []); // 빈 배열을 넣어 한 번만 실행되도록 설정
-
+  }, []);
 
   const toggleKeyword = (word) => {
     setKeywords(prev =>
@@ -154,21 +150,41 @@ const StartPlanningPage = () => {
 
   // 로그인/로그아웃 버튼 클릭 핸들러 추가
   const handleAuthClick = () => {
-    if (isLoggedInUser) { // 실제 로그인된 사용자일 경우에만 로그아웃 처리
-      localStorage.removeItem('userToken'); // 토큰 삭제
-      setIsLoggedInUser(false); // 로그인 상태 false로 변경
+    if (isLoggedInUser) {
+      localStorage.removeItem('userToken');
+      setIsLoggedInUser(false);
       alert('로그아웃 되었습니다.');
-      navigate('/'); // 로그아웃 후 메인 페이지로 이동
-    } else { // 로그인되지 않았거나 게스트 모드일 경우 로그인 페이지로 이동
+      navigate('/');
+    } else {
       navigate('/login'); 
     }
   };
 
-  // FullCalendar에 표시할 이벤트 (예시) - Calendar 컴포넌트로 props 전달
-  const calendarEvents = [
-    // { title: '여행 시작', start: startDate.toISOString().split('T')[0] },
-    // { title: '여행 종료', end: endDate.toISOString().split('T')[0] }
-  ];
+  // ★★★ StartPlanningPage 캘린더에서 날짜 클릭 시 호출될 함수 ★★★
+  const handleCalendarDateSelect = (dateString) => {
+    const clickedDate = moment(dateString).toDate(); // 문자열 날짜를 Date 객체로 변환
+
+    // 만약 시작일이 아직 선택되지 않았거나, 클릭된 날짜가 현재 시작일보다 이전인 경우
+    // 또는 시작일과 종료일이 모두 선택된 상태에서 새로운 날짜를 클릭하는 경우 (새로운 선택 시작)
+    if (!startDate || clickedDate < startDate || (startDate && endDate)) {
+        setStartDate(clickedDate);
+        setEndDate(clickedDate); // 시작일과 종료일을 동일하게 설정
+    } else if (clickedDate >= startDate && clickedDate > endDate) {
+        // 클릭된 날짜가 시작일 이후이고 종료일보다 큰 경우, 종료일을 업데이트
+        setEndDate(clickedDate);
+    } else if (clickedDate >= startDate && clickedDate < endDate) {
+        // 클릭된 날짜가 시작일과 종료일 사이에 있지만 종료일보다 작은 경우,
+        // 시작일을 클릭된 날짜로 변경하고 종료일은 그대로 두거나 다시 시작일로 설정 (기획에 따라 다름)
+        // 여기서는 다시 시작일로 설정하여 새로운 선택 범위 시작
+        setStartDate(clickedDate);
+        setEndDate(clickedDate);
+    }
+
+    // 날짜 선택 후 모달 닫기 (선택 방식에 따라 즉시 닫거나 '선택 완료' 버튼 추가)
+    // 여기서는 일단 선택 즉시 닫음
+    setShowFullCalendarModal(false);
+  };
+
 
   return (
     <div className="planning-wrapper">
@@ -236,7 +252,6 @@ const StartPlanningPage = () => {
           <option value="비행기">비행기</option>
         </select>
 
-        {/* 인원 라벨 중복 제거, 하나만 남김 */}
         <label>인원</label>
         <input
           type="number"
@@ -273,7 +288,7 @@ const StartPlanningPage = () => {
         <div className="keyword-title">인기 키워드 ⭐</div>
 
         <div className="keyword-list">
-          {keywordOptions.map((word) => ( // keywordOptions 상태 사용
+          {keywordOptions.map((word) => (
             <button
               key={word}
               onClick={() => toggleKeyword(word)}
@@ -311,14 +326,21 @@ const StartPlanningPage = () => {
         }} />
       )}
 
+      {/* ★★★ FullCalendar 모달 내 Calendar 컴포넌트 수정 ★★★ */}
       {showFullCalendarModal && (
         <div className="full-calendar-modal-overlay">
           <div className="full-calendar-modal-content">
             <button className="full-calendar-modal-close-btn" onClick={() => setShowFullCalendarModal(false)}>X</button>
-            <h2 className="full-calendar-modal-title">전체 달력 보기</h2>
+            <h2 className="full-calendar-modal-title">날짜 선택</h2> {/* "전체 달력 보기" 대신 "날짜 선택"으로 변경 */}
             <div className="full-calendar-display-wrapper">
-              <Calendar editable={false} selectable={true} events={[]} onDateClick={(info) => alert('클릭한 날짜: ' + info.dateStr)} />
+              {/* Calendar 컴포넌트의 onDateClick 프롭스를 handleCalendarDateSelect 함수와 연결 */}
+              {/* editable, selectable, events 프롭스는 Calendar 컴포넌트 내부에서만 사용될 수 있거나, */}
+              {/* 이 Calendar 컴포넌트가 FullCalendar 라이브러리가 아닌 직접 구현한 컴포넌트이므로 */}
+              {/* 기존 Calendar 컴포넌트가 받는 프롭스에 맞춰 수정해야 합니다. */}
+              {/* 현재 Calendar.js는 onDateClick만 받으므로 다른 프롭스는 제거하거나 해당 컴포넌트가 처리하도록 변경해야 합니다. */}
+              <Calendar onDateClick={handleCalendarDateSelect} />
             </div>
+            {/* 날짜 선택을 위한 추가 안내 문구 */}
           </div>
         </div>
       )}
