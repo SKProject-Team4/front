@@ -74,13 +74,11 @@ function AuthPage() {
         // 로그인 성공 시: localStorage에 더미 토큰 저장
         localStorage.setItem('userToken', 'dummy-jwt-token-12345');
         alert('로그인 성공! 메인 페이지로 이동합니다.');
-        navigate('/main'); // MainPage로 이동
+        navigate('/'); // 메인 페이지로 이동
       } else {
         // 로그인 실패 시
         alert('로그인 실패: 이메일 또는 비밀번호가 올바르지 않습니다.\n(임시 계정: test@example.com / password123)');
       }
-  
-
     } else { // 회원가입 로직 (기존과 동일)
       const { name, email, password, confirmPassword } = formData;
 
@@ -139,10 +137,6 @@ function AuthPage() {
       confirmPassword: ''
     });
     setEmailError('');
-  };
-
-  const goToMainPage = () => {
-    navigate('/'); // React Router를 사용하여 '/main' 경로로 이동
   };
 
   return (
@@ -231,16 +225,9 @@ function AuthPage() {
             </button>
           </p>
         </div>
-
-        {/* 메인 페이지로 이동 버튼 */}
-        <div className="main-page-link-section">
-          <button type="button" onClick={goToMainPage} className="go-to-main-btn">
-            메인 페이지로 이동 (비회원)
-          </button>
-        </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default AuthPage;

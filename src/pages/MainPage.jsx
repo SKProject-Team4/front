@@ -1,53 +1,60 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/sky_main.png'; // 배경 이미지
-// calendarIcon 임포트 제거됨
 import logoImage from '../assets/logo.png'; // 로고 이미지
 import './MainPage.css'; // CSS 파일 임포트
-
-// FullCalendar 관련 임포트
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid'; // 월별 보기 플러그인
-import timeGridPlugin from '@fullcalendar/timegrid'; // 주/일별 보기 플러그인
-import interactionPlugin from '@fullcalendar/interaction'; // 날짜 클릭, 드래그 등 상호작용 플러그인
-
+import Calendar from '../components/Calendar'; // ★★★ Calendar 컴포넌트 임포트 ★★★
 
 const MainPage = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    // 페이지 로드 시 localStorage에 토큰이 있는지 확인하여 로그인 상태 초기화
     const token = localStorage.getItem('userToken');
-    if (token) {
+    // 임시 키(게스트 모드)일 때는 로그인으로 간주하지 않음
+    if (token && token !== 'guest-planning-key-12345') {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  }, []); // 컴포넌트가 처음 렌더링될 때 한 번만 실행
 
   const handleClick = () => {
-    navigate('/start-planning'); // 여행 계획 페이지로 이동
+    // "여행 계획 세우기" 버튼 클릭 시 임시 키 발급 (로그인 처리)
+    const token = localStorage.getItem('userToken');
+    // 실제 사용자가 로그인하지 않은 상태 (토큰 없거나 게스트 키인 경우)일 때만 임시 키 발급
+    if (!token || token === 'guest-planning-key-12345') { 
+      localStorage.setItem('userToken', 'guest-planning-key-12345'); // 임시 토큰 저장
+      alert('비회원용 임시 키가 발급되었습니다. 여행 계획 페이지로 이동합니다.');
+    }
+    navigate('/start-planning'); // 여행 계획 페이지로 이동 (로그인 여부와 관계없이 최종 목적지)
   };
 
   const handleAuthClick = (e) => {
     e.preventDefault();
 
-    if (isLoggedIn) {
+    if (isLoggedIn) { // 실제 로그인된 사용자일 경우에만 로그아웃 처리
       localStorage.removeItem('userToken');
-      setIsLoggedIn(false);
+      setIsLoggedIn(false); // 상태 업데이트
       alert('로그아웃 되었습니다.');
-      navigate('/login'); // 로그인 페이지 경로
-    } else {
-      navigate('/login'); // 로그인 페이지 경로
+      // 로그아웃 후 메인 페이지에 남아있도록 navigate 제거 (요청에 따라 변경)
+    } else { // 로그인되지 않았거나 게스트 모드일 경우 로그인 페이지로 이동
+      navigate('/login'); 
     }
   };
 
-const handleMyPageClick = (e) => {
-  e.preventDefault();
-  navigate('/mypage'); // 마이페이지로 이동
-};
+  const handleMyPageClick = (e) => {
+    e.preventDefault();
+    if (isLoggedIn) { // 실제 로그인된 사용자일 경우 마이페이지로 이동
+        navigate('/mypage'); 
+    } else { // 로그인되지 않았거나 게스트 모드일 경우 로그인 페이지로 이동 요청
+        alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        navigate('/login'); 
+    }
+  };
 
-  const events = []; // 샘플 이벤트 데이터 (현재 비어있음)
+  // events 배열은 Calendar 컴포넌트 내부로 이동하거나, 필요시 props로 전달
 
   return (
     <div
@@ -56,17 +63,15 @@ const handleMyPageClick = (e) => {
         backgroundImage: `url(${backgroundImage})`,
       }}
     >
-      {/* 상단 바 제거됨. 마이페이지/로그인 버튼만 별도로 배치 */}
       <div className="top-right-buttons-container">
         <button type="button" onClick={handleMyPageClick} className="top-bar-button">
-        마이페이지
+          마이페이지
         </button>
         <button type="button" onClick={handleAuthClick} className="top-bar-button">
           {isLoggedIn ? '로그아웃' : '로그인'}
         </button>
       </div>
 
-      {/* 로고 이미지 컨테이너 */}
       <div className="logo-container">
         <img
           src={logoImage}
@@ -75,36 +80,13 @@ const handleMyPageClick = (e) => {
         />
       </div>
 
-      {/* ⬇️ 본문 내용 */}
       <div className="main-content">
         <p className="main-catchphrase-text title-text">"여행이 쉬워진다, AI와 함께라면."</p>
 
-        {/* FullCalendar 삽입 */}
-        <div className="full-calendar-wrapper">
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            headerToolbar={{
-              left: 'prev,next today', // 이전/다음/오늘 버튼은 왼쪽에 유지
-              center: 'title', 
-              right: 'dayGridMonth' // 월별 보기 버튼은 오른쪽에 유지
-            }}
-            events={events}
-            editable={true}
-            selectable={true}
-            locale="ko"
-            height="auto"
-            dateClick={(info) => {
-              alert('날짜 클릭: ' + info.dateStr);
-            }}
-            eventClick={(info) => {
-              alert('이벤트 클릭: ' + info.event.title);
-            }}
-            eventDrop={(info) => {
-              console.log('이벤트 이동:', info.event.title, info.event.startStr);
-            }}
-          />
-        </div>
+        {/* 로그인 상태에 따라 Calendar 컴포넌트를 조건부 렌더링 */}
+        {isLoggedIn && ( // isLoggedIn 상태에 따라 캘린더 렌더링 
+            <Calendar /> 
+        )}
 
         <p className="main-catchphrase-text subtitle-text">당신만의 맞춤 일정과 최고의 경로, 단 한 번의 클릭으로.</p>
 

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'; // useEffect 임포트 추가
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import RegionModal from '../components/RegionModal';
 import calendarIcon from '../assets/calendar.png';
 import Logo from "../components/Logo";
+import Calendar from '../components/Calendar'; // ★★★ Calendar 컴포넌트 임포트 ★★★
 import './StartPlanningPage.css';
 import { MapPin } from 'lucide-react';
 
@@ -16,11 +17,11 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import customMarkerIconUrl from '../assets/logo_2.png'; 
 
-// FullCalendar 관련 임포트
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+// FullCalendar 관련 임포트 제거됨 (Calendar 컴포넌트 내부로 이동)
+// import FullCalendar from '@fullcalendar/react';
+// import dayGridPlugin from '@fullcalendar/dayGrid';
+// import timeGridPlugin from '@fullcalendar/timegrid';
+// import interactionPlugin from '@fullcalendar/interaction';
 
 
 // 사용자 정의 마커 아이콘 정의 (변경 없음)
@@ -94,6 +95,9 @@ const StartPlanningPage = () => {
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [showFullCalendarModal, setShowFullCalendarModal] = useState(false);
 
+  // 로그인 상태 관리를 위한 state 추가 (실제 로그인 여부)
+  const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+
   // 모든 키워드 옵션
   const allKeywordOptions = [
     '혼자 떠나는 여행',
@@ -121,9 +125,18 @@ const StartPlanningPage = () => {
     setKeywordOptions(shuffled.slice(0, 8)); // 8개만 선택하여 표시
   };
 
-  // 컴포넌트 마운트 시 키워드 섞기
+  // 컴포넌트 마운트 시 키워드 섞기 및 로그인 상태 확인
   useEffect(() => {
     shuffleKeywords();
+
+    // 페이지 로드 시 localStorage에 토큰이 있는지 확인하여 실제 로그인 상태 초기화
+    const token = localStorage.getItem('userToken');
+    // 'guest-planning-key-12345'는 실제 로그인으로 간주하지 않음
+    if (token && token !== 'guest-planning-key-12345') {
+      setIsLoggedInUser(true);
+    } else {
+      setIsLoggedInUser(false);
+    }
   }, []); // 빈 배열을 넣어 한 번만 실행되도록 설정
 
 
@@ -144,9 +157,20 @@ const StartPlanningPage = () => {
     });
   };
 
-  // FullCalendar에 표시할 이벤트 (예시)
+  // 로그인/로그아웃 버튼 클릭 핸들러 추가
+  const handleAuthClick = () => {
+    if (isLoggedInUser) { // 실제 로그인된 사용자일 경우에만 로그아웃 처리
+      localStorage.removeItem('userToken'); // 토큰 삭제
+      setIsLoggedInUser(false); // 로그인 상태 false로 변경
+      alert('로그아웃 되었습니다.');
+      navigate('/'); // 로그아웃 후 메인 페이지로 이동
+    } else { // 로그인되지 않았거나 게스트 모드일 경우 로그인 페이지로 이동
+      navigate('/login'); 
+    }
+  };
+
+  // FullCalendar에 표시할 이벤트 (예시) - Calendar 컴포넌트로 props 전달
   const calendarEvents = [
-    // 여기에 실제 여행 일정을 추가할 수 있습니다.
     // { title: '여행 시작', start: startDate.toISOString().split('T')[0] },
     // { title: '여행 종료', end: endDate.toISOString().split('T')[0] }
   ];
@@ -161,12 +185,12 @@ const StartPlanningPage = () => {
         </div>
         {/* 로고 */}
         <Logo className="planning-logo" />
-        {/* 로그인 버튼 */}
+        {/* 로그인/로그아웃 버튼 */}
         <button
           className="login-button"
-          onClick={() => navigate('/login')}
+          onClick={handleAuthClick}
         >
-          로그인
+          {isLoggedInUser ? '로그아웃' : '로그인'}
         </button>
       </div>
 
@@ -272,16 +296,12 @@ const StartPlanningPage = () => {
         <button onClick={handleSearch} className="search-button">🔍검색</button>
       </div>
 
-      {/* 지도 모달 */}
       {showMap && (
         <div className="map-modal-overlay">
           <div className="map-modal-content">
             <button className="map-modal-close-btn" onClick={() => setShowMap(false)}>X</button>
             <MapContainer center={[37.5665, 126.9780]} zoom={13} scrollWheelZoom={true} className="leaflet-map-container">
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               <MapClickHandler onSelectRegion={setSelectedRegion} onCloseMap={() => setShowMap(false)} />
             </MapContainer>
             <p className="map-instruction">지도에서 원하는 위치를 클릭하여 지역을 선택하세요.</p>
@@ -289,43 +309,21 @@ const StartPlanningPage = () => {
         </div>
       )}
 
-      {/* 지역 선택 모달 (RegionModal) */}
       {showRegionModal && (
-        <RegionModal
-          onClose={() => setShowRegionModal(false)}
-          onSelect={(region) => {
-            setSelectedRegion(region);
-            setShowRegionModal(false);
-          }}
-        />
+        <RegionModal onClose={() => setShowRegionModal(false)} onSelect={(region) => {
+          setSelectedRegion(region);
+          setShowRegionModal(false);
+        }} />
       )}
 
-      {/* FullCalendar 모달 */}
       {showFullCalendarModal && (
         <div className="full-calendar-modal-overlay">
           <div className="full-calendar-modal-content">
             <button className="full-calendar-modal-close-btn" onClick={() => setShowFullCalendarModal(false)}>X</button>
             <h2 className="full-calendar-modal-title">전체 달력 보기</h2>
             <div className="full-calendar-display-wrapper">
-              <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                headerToolbar={{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth'
-                }}
-                events={calendarEvents}
-                editable={false}
-                selectable={true}
-                locale="ko"
-                height="auto"
-                dateClick={(info) => {
-                  alert('클릭한 날짜: ' + info.dateStr);
-                }}
-              />
+              <Calendar editable={false} selectable={true} events={[]} onDateClick={(info) => alert('클릭한 날짜: ' + info.dateStr)} />
             </div>
-            <p className="full-calendar-instruction">현재 선택된 여행 날짜를 포함한 전체 달력을 확인하세요.</p>
           </div>
         </div>
       )}
