@@ -1,5 +1,5 @@
 // src/components/Calendar.jsx
-import React, { useState, useRef, useEffect } from 'react'; // useRef와 useEffect 훅을 임포트합니다.
+import { useState, useRef, useEffect } from 'react'; // useRef와 useEffect 훅을 임포트합니다.
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
