@@ -19,6 +19,8 @@ RUN npm cache clean --force && \
 COPY . .
 
 # React 애플리케이션 빌드
+# 프로젝트에 맞는 실제 빌드 명령어로 변경해주세요.
+# 예: npm run build 대신 `npm run dev` 또는 `yarn build` 등
 RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # --- Stage 2: Serve the built application with Nginx ---
@@ -27,7 +29,8 @@ FROM nginx:alpine AS production-stage
 # Nginx 기본 설정 파일 제거
 RUN rm /etc/nginx/conf.d/default.conf
 # 사용자 정의 Nginx 설정 파일 복사
-COPY nginx.conf /etc/nginx/conf.d/my-app.conf
+# nginx.conf 파일이 src/nginx/ 경로에 있으므로 해당 경로를 명시합니다.
+COPY src/nginx/nginx.conf /etc/nginx/conf.d/my-app.conf
 
 # 빌드 스테이지에서 빌드된 애플리케이션 파일을 Nginx 서빙 디렉토리로 복사
 # Vite의 기본 빌드 출력 경로는 'dist'입니다.
