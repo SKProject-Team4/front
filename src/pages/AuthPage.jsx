@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import './AuthPage.css'; // AuthPage.css 파일의 경로가 AuthPage.jsx와 같은 폴더에 있다고 가정
-import logo from '../assets/logo.png'; // src/pages/에서 봤을 때 src/assets/logo.png
-
-// AuthService 임포트 경로 
-import AuthService from '../services/AuthService'; 
-import axios from 'axios';
-import CustomAlert from '../components/CustomAlert'; // 💡 커스텀 알림창 임포트
+import './AuthPage.css';
+import logo from '../assets/logo.png';
+import AuthService from '../services/AuthService';
+import CustomAlert from '../components/CustomAlert';
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,7 +15,7 @@ function AuthPage() {
     confirmPassword: ''
   });
   const [emailError, setEmailError] = useState('');
-  const [alertMessage, setAlertMessage] = useState(''); // 💬 커스텀 알림창 메시지
+  const [alertMessage, setAlertMessage] = useState('');
 
   const navigate = useNavigate();
 
@@ -38,32 +35,27 @@ function AuthPage() {
       return '유효한 이메일 형식이 아닙니다.';
     }
 
-    // ★★★ 이메일 중복 확인 API 연동 - AuthService 사용 ★★★
     const result = await AuthService.checkEmailDuplicate(email);
     if (!result.success) {
-      return result.message; // 에러 메시지 반환
+      return result.message;
     }
-    return ''; // 에러 없음
+    return '';
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isLogin) {
-      console.log('로그인 시도:', { email: formData.email, password: formData.password });
-
-      // ★★★ 로그인 API 연동 - AuthService 사용 ★★★
       const result = await AuthService.login(formData.email, formData.password);
 
       if (result.success) {
         localStorage.setItem('userToken', result.token);
-        alert('로그인 성공! 메인 페이지로 이동합니다.');
-        navigate('/');
+        setAlertMessage('로그인 성공! 메인 페이지로 이동합니다.');
+        setTimeout(() => navigate('/'), 1000);
       } else {
-        alert('로그인 실패: ' + result.message);
+        setAlertMessage('로그인 실패: ' + result.message);
         console.error('로그인 실패 (AuthPage):', result.message);
       }
-
     } else {
       const { name, email, password, confirmPassword } = formData;
 
@@ -72,22 +64,20 @@ function AuthPage() {
         return;
       }
 
-      // 회원가입 전에 이메일 유효성 및 중복 확인
       const emailValidationMessage = await validateEmail(email);
       if (emailValidationMessage) {
         setEmailError(emailValidationMessage);
         return;
       }
 
-      // ★★★ 회원가입 API 연동 - AuthService 사용 ★★★
       const registerResult = await AuthService.register(name, email, password);
 
       if (registerResult.success) {
-        alert('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
-        setIsLogin(true); // 회원가입 성공 후 로그인 모드로 전환
+        setAlertMessage('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
+        setIsLogin(true);
         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
       } else {
-        alert('회원가입 실패: ' + registerResult.message);
+        setAlertMessage('회원가입 실패: ' + registerResult.message);
         console.error('회원가입 실패 (AuthPage):', registerResult.message);
       }
     }

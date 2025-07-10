@@ -1,31 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './MyPage.css'; // MyPage 전용 CSS 파일 임포트
-import AuthService from '../services/AuthService'; // AuthService 임포트 (이메일 중복 확인용)
-import UserService from '../services/UserService'; // UserService 임포트
+import './MyPage.css';
+import AuthService from '../services/AuthService';
+import UserService from '../services/UserService';
+import CustomAlert from '../components/CustomAlert'; // ✅ 커스텀 알림창 임포트
 
 const MyPage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [originalEmail, setOriginalEmail] = useState(''); // 초기 이메일 저장을 위한 상태
+  const [originalEmail, setOriginalEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
-  const [emailError, setEmailError] = useState(''); // 이메일 중복 오류 메시지
+  const [isLoading, setIsLoading] = useState(true);
+  const [emailError, setEmailError] = useState('');
+
+  // ✅ 커스텀 알림 상태 추가
+  const [alertMessage, setAlertMessage] = useState('');
+  const [redirectPath, setRedirectPath] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem('userToken');
 
-      // 토큰이 없거나 게스트 키인 경우 마이페이지 접근 불가
       if (!token || token === 'guest-planning-key-12345') {
-        alert('마이페이지는 로그인한 사용자만 이용할 수 있습니다. 로그인 페이지로 이동합니다.');
-        navigate('/login');
+        setAlertMessage('마이페이지는 로그인한 사용자만 이용할 수 있습니다.');
+        setRedirectPath('/login');
         return;
       }
 
-      // UserService를 사용하여 사용자 프로필 정보 조회
       const result = await UserService.fetchUserProfile(token);
 
       if (result.success) {
@@ -34,9 +37,9 @@ const MyPage = () => {
         setOriginalEmail(result.user.email);
         setIsLoading(false);
       } else {
-        alert(result.message || '사용자 정보를 불러오는 데 실패했습니다.');
-        localStorage.removeItem('userToken'); // 실패 시 토큰 제거
-        navigate('/login');
+        setAlertMessage(result.message || '사용자 정보를 불러오는 데 실패했습니다.');
+        localStorage.removeItem('userToken');
+        setRedirectPath('/login');
       }
     };
 
@@ -47,43 +50,41 @@ const MyPage = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      setAlertMessage('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
       return;
     }
 
-    // 이메일 변경 시에만 중복 체크 수행 (AuthService 재활용)
     if (email !== originalEmail) {
       const emailCheckResult = await AuthService.checkEmailDuplicate(email);
-      if (!emailCheckResult.success) { // 중복이거나 오류 발생
+      if (!emailCheckResult.success) {
         setEmailError(emailCheckResult.message);
-        alert(emailCheckResult.message);
+        setAlertMessage(emailCheckResult.message);
         return;
       }
-      setEmailError(''); // 에러가 없으면 초기화
+      setEmailError('');
     }
 
     const token = localStorage.getItem('userToken');
     if (!token) {
-      alert('로그인이 필요합니다.');
-      navigate('/login');
+      setAlertMessage('로그인이 필요합니다.');
+      setRedirectPath('/login');
       return;
     }
 
-    // UserService를 사용하여 사용자 프로필 정보 업데이트
     const updateResult = await UserService.updateUserProfile(token, name, email, password);
 
     if (updateResult.success) {
-      alert(updateResult.message);
-      setOriginalEmail(email); // 이메일 변경이 성공하면 originalEmail 업데이트
-      setPassword(''); // 비밀번호 초기화
-      setConfirmPassword(''); // 비밀번호 확인 초기화
+      setAlertMessage(updateResult.message);
+      setOriginalEmail(email);
+      setPassword('');
+      setConfirmPassword('');
     } else {
-      alert('회원 정보 업데이트에 실패했습니다: ' + updateResult.message);
+      setAlertMessage('회원 정보 업데이트에 실패했습니다: ' + updateResult.message);
     }
   };
 
   const handleGoToMain = () => {
-    navigate('/'); // 메인 페이지로 이동
+    navigate('/');
   };
 
   if (isLoading) {
@@ -97,13 +98,26 @@ const MyPage = () => {
         <div className="mypage-content-wrapper">
           <p>사용자 정보를 불러오는 중입니다...</p>
         </div>
+
+        {/* ✅ 알림창 표시 */}
+        {alertMessage && (
+          <CustomAlert
+            message={alertMessage}
+            onClose={() => {
+              setAlertMessage('');
+              if (redirectPath) {
+                navigate(redirectPath);
+                setRedirectPath(null);
+              }
+            }}
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className="mypage-container">
-      {/* 상단 메인 페이지 버튼 */}
       <div className="top-right-buttons-container">
         <button type="button" onClick={handleGoToMain} className="top-bar-button">
           메인 페이지
@@ -159,6 +173,20 @@ const MyPage = () => {
           </button>
         </form>
       </div>
+
+      {/* ✅ 알림창 표시 */}
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => {
+            setAlertMessage('');
+            if (redirectPath) {
+              navigate(redirectPath);
+              setRedirectPath(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
