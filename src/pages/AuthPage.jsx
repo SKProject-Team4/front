@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import './AuthPage.css';
-import logo from '../assets/logo.png';
+import './AuthPage.css'; // AuthPage.css 파일의 경로가 AuthPage.jsx와 같은 폴더에 있다고 가정
+import logo from '../assets/logo.png'; // src/pages/에서 봤을 때 src/assets/logo.png
+
+// AuthService 임포트 경로 
+import AuthService from '../services/AuthService'; 
 import axios from 'axios';
 import CustomAlert from '../components/CustomAlert'; // 💡 커스텀 알림창 임포트
 
@@ -18,8 +21,6 @@ function AuthPage() {
   const [alertMessage, setAlertMessage] = useState(''); // 💬 커스텀 알림창 메시지
 
   const navigate = useNavigate();
-
-  const API_BASE_URL = 'http://localhost:8080';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,60 +38,30 @@ function AuthPage() {
       return '유효한 이메일 형식이 아닙니다.';
     }
 
-    try {
-      const response = await axios.get(`${API_BASE_URL}/users/check_username`, {
-        params: { email },
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (response.data.status === 'success' && response.data.code === 200) {
-        return '';
-      } else if (response.data.status === 'error' && response.data.message === '이미 사용 중인 아이디입니다.') {
-        return '이미 등록된 이메일입니다.';
-      } else {
-        return '이메일 중복 확인 중 알 수 없는 오류가 발생했습니다.';
-      }
-    } catch (error) {
-      if (error.response) {
-        if (error.response.data.message === '이미 사용 중인 아이디입니다.') {
-          return '이미 등록된 이메일입니다.';
-        }
-        return '이메일 중복 확인 중 서버 오류가 발생했습니다.';
-      } else if (error.request) {
-        return '이메일 중복 확인 중 네트워크 오류가 발생했습니다.';
-      } else {
-        return '이메일 중복 확인 중 오류가 발생했습니다.';
-      }
+    // ★★★ 이메일 중복 확인 API 연동 - AuthService 사용 ★★★
+    const result = await AuthService.checkEmailDuplicate(email);
+    if (!result.success) {
+      return result.message; // 에러 메시지 반환
     }
+    return ''; // 에러 없음
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isLogin) {
-      try {
-        const response = await axios.post(`${API_BASE_URL}/users/login`, {
-          email: formData.email,
-          password: formData.password
-        }, {
-          headers: { 'Content-Type': 'application/json' }
-        });
+      console.log('로그인 시도:', { email: formData.email, password: formData.password });
 
-        if (response.data.status === 'success' && response.data.data?.token) {
-          localStorage.setItem('userToken', response.data.data.token);
-          setAlertMessage('로그인 성공! 메인 페이지로 이동합니다.');
-          setTimeout(() => navigate('/'), 1000);
-        } else {
-          setAlertMessage('로그인 실패: ' + (response.data.message || '이메일 또는 비밀번호가 올바르지 않습니다.'));
-        }
-      } catch (error) {
-        if (error.response) {
-          setAlertMessage('로그인 실패: ' + (error.response.data.message || '서버 오류가 발생했습니다.'));
-        } else if (error.request) {
-          setAlertMessage('로그인 실패: 서버로부터 응답을 받지 못했습니다. 네트워크 연결을 확인해주세요.');
-        } else {
-          setAlertMessage('로그인 실패: 요청을 보내는 중 오류가 발생했습니다.');
-        }
+      // ★★★ 로그인 API 연동 - AuthService 사용 ★★★
+      const result = await AuthService.login(formData.email, formData.password);
+
+      if (result.success) {
+        localStorage.setItem('userToken', result.token);
+        alert('로그인 성공! 메인 페이지로 이동합니다.');
+        navigate('/');
+      } else {
+        alert('로그인 실패: ' + result.message);
+        console.error('로그인 실패 (AuthPage):', result.message);
       }
 
     } else {
@@ -101,36 +72,23 @@ function AuthPage() {
         return;
       }
 
-      const error = await validateEmail(email);
-      if (error) {
-        setEmailError(error);
+      // 회원가입 전에 이메일 유효성 및 중복 확인
+      const emailValidationMessage = await validateEmail(email);
+      if (emailValidationMessage) {
+        setEmailError(emailValidationMessage);
         return;
       }
 
-      try {
-        const registerResponse = await axios.post(`${API_BASE_URL}/users/register`, {
-          username: name,
-          email,
-          password
-        }, {
-          headers: { 'Content-Type': 'application/json' }
-        });
+      // ★★★ 회원가입 API 연동 - AuthService 사용 ★★★
+      const registerResult = await AuthService.register(name, email, password);
 
-        if (registerResponse.data.status === 'success' && registerResponse.data.code === 200) {
-          setAlertMessage('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
-          setIsLogin(true);
-          setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-        } else {
-          setAlertMessage('회원가입 실패: ' + (registerResponse.data.message || '알 수 없는 오류'));
-        }
-      } catch (error) {
-        if (error.response) {
-          setAlertMessage('회원가입 실패: ' + (error.response.data.message || '서버 오류가 발생했습니다.'));
-        } else if (error.request) {
-          setAlertMessage('회원가입 실패: 서버로부터 응답을 받지 못했습니다. 네트워크 연결을 확인해주세요.');
-        } else {
-          setAlertMessage('회원가입 실패: 요청을 보내는 중 오류가 발생했습니다.');
-        }
+      if (registerResult.success) {
+        alert('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
+        setIsLogin(true); // 회원가입 성공 후 로그인 모드로 전환
+        setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+      } else {
+        alert('회원가입 실패: ' + registerResult.message);
+        console.error('회원가입 실패 (AuthPage):', registerResult.message);
       }
     }
   };

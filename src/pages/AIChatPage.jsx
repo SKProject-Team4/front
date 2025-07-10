@@ -3,18 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './AIChatPage.css';
 import Logo from "../components/Logo";
 import CustomAlert from "../components/CustomAlert"; // 💡 알림창 컴포넌트 임포트
-
-// 장소 추출
-const extractPlaces = (text) => {
-  const regex = /어린이대공원|뚝섬한강공원|서울숲|세종대학교 벚꽃길|건대입구 커먼그라운드/g;
-  return text.match(regex) || [];
-};
-
-// AI 응답 시뮬레이션
-const getRouteFromAI = async (selectedPlaces) => {
-  const list = selectedPlaces.join(" → ");
-  return `✨ 선택하신 장소를 기반으로 추천 코스를 알려드릴게요!\n\n${list} 도보 코스는 하루 일정으로 적당해요! 중간중간 휴식 장소도 추천드려요 ☕`;
-};
+// AIService 임포트
+import AIService from '../services/AIService'; // src/pages/에서 src/services/로 접근
 
 const AIChatPage = () => {
   const navigate = useNavigate();
@@ -22,11 +12,12 @@ const AIChatPage = () => {
   const { state } = location;
 
   const initialQuestion = state?.question || '질문이 전달되지 않았습니다.';
-  const initialAnswer = `안녕하세요!\n${initialQuestion}\n기준으로 여행 일정을 추천해드릴게요 🌿\n\n1일차: 어린이대공원, 뚝섬한강공원\n2일차: 서울숲, 세종대학교 벚꽃길, 건대입구 커먼그라운드\n\n즐거운 여행 되세요! ✈️🧳`;
+  // AIService에서 초기 AI 응답 가져오기
+  const initialAIAnswer = AIService.getInitialAIResponse(initialQuestion);
 
   const [messages, setMessages] = useState([
     { role: 'user', text: initialQuestion },
-    { role: 'ai', text: initialAnswer }
+    { role: 'ai', text: initialAIAnswer }
   ]);
   const [places, setPlaces] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
@@ -47,7 +38,8 @@ const AIChatPage = () => {
   useEffect(() => {
     const latestAI = messages.findLast((m) => m.role === 'ai');
     if (latestAI) {
-      const found = extractPlaces(latestAI.text);
+      // AIService에서 장소 추출 함수 사용
+      const found = AIService.extractPlaces(latestAI.text);
       setPlaces(found);
     }
   }, [messages]);
@@ -60,8 +52,8 @@ const AIChatPage = () => {
   const handleComplete = async () => {
     if (selectedPlaces.length === 0) return;
     const placeText = selectedPlaces.join(', ');
-    const question = `${placeText} 으로 도보 여행 코스 추천해줘`;
-    const answer = await getRouteFromAI(selectedPlaces);
+    // AIService에서 경로 추천 함수 사용
+    const answer = await AIService.getRouteFromAI(selectedPlaces);
 
     setMessages((prev) => [
       ...prev,
