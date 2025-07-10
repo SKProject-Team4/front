@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 🚨 백엔드 API의 기본 URL을 여기에 설정해주세요!
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8099';
 
 // 임시 로그인 토큰 (개발용)
 const TEMP_LOGIN_TOKEN = 'YOUR_TEMPORARY_JWT_TOKEN_HERE_FOR_DEVELOPMENT_ONLY';
