@@ -9,6 +9,7 @@ import Calendar from '../components/Calendar'; // ★★★ Calendar 컴포넌�
 import './StartPlanningPage.css';
 import { MapPin } from 'lucide-react';
 import moment from 'moment'; // moment.js 임포트 (Calendar 컴포넌트와 동일하게)
+import CustomAlert from "../components/CustomAlert";
 
 
 // Leaflet 관련 임포트 (기존과 동일)
