@@ -15,7 +15,8 @@ on:
 # 환경 변수를 정의합니다.
 env:
   REGISTRY: docker.io # 사용할 컨테이너 레지스트리 (Docker Hub)
-  IMAGE_NAME: ${{ github.repository }} # 이미지 이름 (GitHub 레포지토리 이름 사용)
+  # Docker Hub에 생성한 레포지토리 이름과 정확히 일치하도록 명시합니다.
+  IMAGE_NAME: skproject-team4/front 
 
 # 워크플로우를 구성하는 작업(jobs)들을 정의합니다.
 jobs:
