@@ -16,8 +16,8 @@ on:
 env:
   REGISTRY: docker.io # 사용할 컨테이너 레지스트리 (Docker Hub)
   # Docker Hub에 생성한 레포지토리 이름과 정확히 일치하도록 명시합니다.
-  # 사용자 이름(udd43)을 포함한 전체 레포지토리 경로로 수정했습니다.
-  IMAGE_NAME: udd43/skproject-team4-front 
+  DOCKER_IMAGE: udd43/skproject-team4-front # 이미지 이름 (사용자 이름/레포지토리 이름)
+  DOCKER_TAG: client0.1 # 명시적으로 지정할 태그
 
 # 워크플로우를 구성하는 작업(jobs)들을 정의합니다.
 jobs:
@@ -52,12 +52,14 @@ jobs:
 
       # 4. Docker 이미지 메타데이터 설정
       # Docker 이미지에 대한 태그, 레이블 등의 메타데이터를 생성합니다.
+      # 여기서는 DOCKER_IMAGE와 DOCKER_TAG를 사용하여 태그를 명시적으로 설정합니다.
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}
           tags: |
+            ${{ env.DOCKER_TAG }} # 명시적으로 지정한 태그 사용
             type=raw,value=latest,enable={{is_default_branch}} # 기본 브랜치(예: main)에 푸시될 때 latest 태그
             type=sha,format=long,prefix=sha- # 커밋 SHA 기반 태그 (예: sha-abcdef123456)
             type=ref,event=branch # 브랜치 이름을 태그로 사용 (예: main, jongwon)
