@@ -9,18 +9,15 @@ import Calendar from '../components/Calendar';
 import './StartPlanningPage.css';
 import { MapPin } from 'lucide-react';
 import moment from 'moment';
+import CustomAlert from "../components/CustomAlert";
 
-// Leaflet 관련 임포트 (기존과 동일)
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-
-// Leaflet 마커 아이콘 설정 (기존과 동일)
 import L from 'leaflet';
 import customMarkerIconUrl from '../assets/logo_2.png';
 
-// 서비스 파일 임포트
-import AuthService from '../services/AuthService'; // AuthService 임포트 (로그인 상태 확인용)
-import PlanningService from '../services/PlanningService'; // PlanningService 임포트 (지역, 키워드 관련)
+import AuthService from '../services/AuthService';
+import PlanningService from '../services/PlanningService';
 
 const CustomMarkerIcon = L.icon({
   iconUrl: customMarkerIconUrl,
@@ -35,11 +32,10 @@ const CustomMarkerIcon = L.icon({
 
 L.Marker.prototype.options.icon = CustomMarkerIcon;
 
-
 // 지도 클릭 이벤트 핸들러 컴포넌트
-const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
+const MapClickHandler = ({ onSelectRegion, onCloseMap, onError }) => {
   const [markerPosition, setMarkerPosition] = useState(null);
-  const map = useMapEvents({
+  useMapEvents({
     click: async (e) => {
       const { lat, lng } = e.latlng;
       setMarkerPosition([lat, lng]);
@@ -49,14 +45,13 @@ const MapClickHandler = ({ onSelectRegion, onCloseMap }) => {
         onSelectRegion(result.address);
         onCloseMap();
       } else {
-        alert(result.message);
         onCloseMap();
+        onError(result.message); // ❗ 부모에게 전달
       }
     },
   });
   return markerPosition ? <Marker position={markerPosition} /> : null;
 };
-
 
 const StartPlanningPage = () => {
   const navigate = useNavigate();
@@ -71,16 +66,15 @@ const StartPlanningPage = () => {
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [showFullCalendarModal, setShowFullCalendarModal] = useState(false);
 
-  // 로그인 상태 관리를 위한 state 추가 (실제 로그인 여부)
-  const [isLoggedInUser, setIsLoggedInUser] = useState(false); // 실제 사용자 로그인 여부
-  const [isGuestUser, setIsGuestUser] = useState(false); // 게스트 로그인 여부
-
-  // 렌더링에 사용될 키워드 옵션을 관리하는 상태 추가
+  const [isLoggedInUser, setIsLoggedInUser] = useState(false);
+  const [isGuestUser, setIsGuestUser] = useState(false);
   const [keywordOptions, setKeywordOptions] = useState([]);
 
-  // 컴포넌트 마운트 시 키워드 섞기 및 로그인 상태 확인
+  const [alertMessage, setAlertMessage] = useState(''); // ✅ 알림창 상태
+  const [redirectPath, setRedirectPath] = useState(null); // ✅ 알림 후 이동 경로
+
   useEffect(() => {
-    setKeywordOptions(PlanningService.getRandomKeywords()); // 서비스에서 키워드 가져오기
+    setKeywordOptions(PlanningService.getRandomKeywords());
 
     const checkLoginStatus = async () => {
       const result = await AuthService.checkLoginStatus();
@@ -97,9 +91,7 @@ const StartPlanningPage = () => {
   };
 
   const handleSearch = () => {
-    const formatDate = (date) => {
-      return `${date.getMonth() + 1}월 ${date.getDate()}일`;
-    };
+    const formatDate = (date) => `${date.getMonth() + 1}월 ${date.getDate()}일`;
 
     const question = `${formatDate(startDate)}부터 ${formatDate(endDate)}까지 ${people || '여러'}명이 ${selectedRegion || '어딘가'}로 ${transport || '알맞은 교통수단으로'} 여행을 가려고 해. ${keywords.length > 0 ? `${keywords.join(', ')} 같은 키워드에 맞는 장소` : '좋은 여행지'}를 추천해줄래?`;
     navigate('/ai-chat', {
@@ -107,65 +99,50 @@ const StartPlanningPage = () => {
     });
   };
 
-  // 로그인/로그아웃 버튼 클릭 핸들러
   const handleAuthClick = async () => {
-    const result = await AuthService.logout(); // AuthService의 logout 함수 사용
+    const result = await AuthService.logout();
     if (result.success) {
       setIsLoggedInUser(false);
-      setIsGuestUser(false); // 게스트 상태도 초기화
-      alert(result.message);
-      navigate('/');
+      setIsGuestUser(false);
+      setAlertMessage(result.message);
+      setRedirectPath('/');
     } else {
-      alert(result.message);
+      setAlertMessage(result.message);
     }
   };
 
-  // StartPlanningPage 캘린더에서 날짜 클릭 시 호출될 함수
   const handleCalendarDateSelect = (dateString) => {
-    const clickedDate = moment(dateString).toDate(); // 문자열 날짜를 Date 객체로 변환
-
+    const clickedDate = moment(dateString).toDate();
     if (!startDate || clickedDate < startDate || (startDate && endDate)) {
-        setStartDate(clickedDate);
-        setEndDate(clickedDate); // 시작일과 종료일을 동일하게 설정
+      setStartDate(clickedDate);
+      setEndDate(clickedDate);
     } else if (clickedDate >= startDate && clickedDate > endDate) {
-        setEndDate(clickedDate);
+      setEndDate(clickedDate);
     } else if (clickedDate >= startDate && clickedDate < endDate) {
-        setStartDate(clickedDate);
-        setEndDate(clickedDate);
+      setStartDate(clickedDate);
+      setEndDate(clickedDate);
     }
-
     setShowFullCalendarModal(false);
   };
 
-
   return (
     <div className="planning-wrapper">
-      {/* 새로운 고정 상단바 컨테이너 */}
       <div className="fixed-app-header">
-        {/* 캘린더 아이콘 */}
         <div className="calendar-icon-wrapper" onClick={() => setShowFullCalendarModal(true)}>
           <img src={calendarIcon} alt="캘린더" className="calendar-icon" />
         </div>
-        {/* 로고 */}
         <Logo className="planning-logo" />
-        {/* 로그인/로그아웃 버튼 */}
-        <button
-          className="login-button"
-          onClick={handleAuthClick}
-        >
-          {isLoggedInUser || isGuestUser ? '로그아웃' : '로그인'} {/* 실제 로그인 또는 게스트인 경우 로그아웃 버튼 표시 */}
+        <button className="login-button" onClick={handleAuthClick}>
+          {isLoggedInUser || isGuestUser ? '로그아웃' : '로그인'}
         </button>
       </div>
 
-      {/* 입력폼 */}
       <div className="form-container">
-        {/* '지역' 라벨과 지도 아이콘을 포함하는 div */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <label style={{ marginBottom: '0' }}>지역</label>
-            {/* 지도 아이콘 클릭 시 지도 모달 열기 */}
-            <MapPin size={20} className="map-pin-icon" onClick={() => setShowMap(true)} style={{ cursor: 'pointer' }} />
+          <label style={{ marginBottom: '0' }}>지역</label>
+          <MapPin size={20} className="map-pin-icon" onClick={() => setShowMap(true)} style={{ cursor: 'pointer' }} />
         </div>
-        {/* 지역 선택 버튼 클릭 시 RegionModal 열기 */}
+
         <button onClick={() => setShowRegionModal(true)} className="input-btn">
           {selectedRegion || '지역 선택하기'}
         </button>
@@ -176,9 +153,7 @@ const StartPlanningPage = () => {
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              if (date > endDate) {
-                setEndDate(date); // 시작일이 종료일보다 늦으면 종료일도 같이 변경
-              }
+              if (date > endDate) setEndDate(date);
             }}
             selectsStart
             startDate={startDate}
@@ -191,7 +166,7 @@ const StartPlanningPage = () => {
             selectsEnd
             startDate={startDate}
             endDate={endDate}
-            minDate={startDate} // 시작일 이후만 선택 가능
+            minDate={startDate}
           />
         </div>
 
@@ -212,12 +187,7 @@ const StartPlanningPage = () => {
           value={people}
           onChange={(e) => {
             const value = e.target.value;
-
-            if (value === '') {
-              setPeople('');
-              return;
-            }
-
+            if (value === '') return setPeople('');
             const parsed = parseInt(value, 10);
             if (!isNaN(parsed) && parsed >= 1) {
               setPeople(parsed.toString());
@@ -264,7 +234,11 @@ const StartPlanningPage = () => {
             <button className="map-modal-close-btn" onClick={() => setShowMap(false)}>X</button>
             <MapContainer center={[37.5665, 126.9780]} zoom={13} scrollWheelZoom={true} className="leaflet-map-container">
               <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <MapClickHandler onSelectRegion={setSelectedRegion} onCloseMap={() => setShowMap(false)} />
+              <MapClickHandler
+                onSelectRegion={setSelectedRegion}
+                onCloseMap={() => setShowMap(false)}
+                onError={(msg) => setAlertMessage(msg)} // ✅ alert → CustomAlert
+              />
             </MapContainer>
             <p className="map-instruction">지도에서 원하는 위치를 클릭하여 지역을 선택하세요.</p>
           </div>
@@ -284,14 +258,28 @@ const StartPlanningPage = () => {
             <button className="full-calendar-modal-close-btn" onClick={() => setShowFullCalendarModal(false)}>X</button>
             <h2 className="full-calendar-modal-title">날짜 선택</h2>
             <div className="full-calendar-display-wrapper">
-              <Calendar onDateSelect={(dateRange) => { // Calendar 컴포넌트가 { start, end } 객체를 반환하도록 수정 가정
-                  setStartDate(dateRange.start);
-                  setEndDate(dateRange.end);
-                  setShowFullCalendarModal(false);
+              <Calendar onDateSelect={(dateRange) => {
+                setStartDate(dateRange.start);
+                setEndDate(dateRange.end);
+                setShowFullCalendarModal(false);
               }} />
             </div>
           </div>
         </div>
+      )}
+
+      {/* 💡 커스텀 알림창 */}
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => {
+            setAlertMessage('');
+            if (redirectPath) {
+              navigate(redirectPath);
+              setRedirectPath(null);
+            }
+          }}
+        />
       )}
     </div>
   );

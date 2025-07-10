@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import './AuthPage.css'; // AuthPage.css 파일의 경로가 AuthPage.jsx와 같은 폴더에 있다고 가정
-import logo from '../assets/logo.png'; // src/pages/에서 봤을 때 src/assets/logo.png
-
-// AuthService 임포트 경로 
-import AuthService from '../services/AuthService'; 
+import './AuthPage.css';
+import logo from '../assets/logo.png';
+import AuthService from '../services/AuthService';
+import CustomAlert from '../components/CustomAlert';
 
 function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    name: '', // username 대신 name으로 사용 중
+    name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
   const [emailError, setEmailError] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ function AuthPage() {
       [name]: value
     }));
     if (name === 'email') {
-      setEmailError(''); // 이메일 입력 시 오류 메시지 초기화
+      setEmailError('');
     }
   };
 
@@ -35,82 +35,64 @@ function AuthPage() {
       return '유효한 이메일 형식이 아닙니다.';
     }
 
-    // ★★★ 이메일 중복 확인 API 연동 - AuthService 사용 ★★★
     const result = await AuthService.checkEmailDuplicate(email);
     if (!result.success) {
-      return result.message; // 에러 메시지 반환
+      return result.message;
     }
-    return ''; // 에러 없음
+    return '';
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isLogin) {
-      console.log('로그인 시도:', { email: formData.email, password: formData.password });
-
-      // ★★★ 로그인 API 연동 - AuthService 사용 ★★★
       const result = await AuthService.login(formData.email, formData.password);
 
       if (result.success) {
         localStorage.setItem('userToken', result.token);
-        alert('로그인 성공! 메인 페이지로 이동합니다.');
-        navigate('/');
+        setAlertMessage('로그인 성공! 메인 페이지로 이동합니다.');
+        setTimeout(() => navigate('/'), 1000);
       } else {
-        alert('로그인 실패: ' + result.message);
+        setAlertMessage('로그인 실패: ' + result.message);
         console.error('로그인 실패 (AuthPage):', result.message);
       }
-
-    } else { // 회원가입 로직
+    } else {
       const { name, email, password, confirmPassword } = formData;
 
       if (password !== confirmPassword) {
-        alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        setAlertMessage('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
         return;
       }
 
-      // 회원가입 전에 이메일 유효성 및 중복 확인
       const emailValidationMessage = await validateEmail(email);
       if (emailValidationMessage) {
         setEmailError(emailValidationMessage);
         return;
       }
 
-      console.log('회원가입 시도:', formData);
-
-      // ★★★ 회원가입 API 연동 - AuthService 사용 ★★★
       const registerResult = await AuthService.register(name, email, password);
 
       if (registerResult.success) {
-        alert('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
-        setIsLogin(true); // 회원가입 성공 후 로그인 모드로 전환
+        setAlertMessage('회원가입이 성공적으로 완료되었습니다! 이제 로그인할 수 있습니다.');
+        setIsLogin(true);
         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
       } else {
-        alert('회원가입 실패: ' + registerResult.message);
+        setAlertMessage('회원가입 실패: ' + registerResult.message);
         console.error('회원가입 실패 (AuthPage):', registerResult.message);
       }
     }
   };
 
-  // ★★★ 임시 로그인 함수 추가 ★★★
   const handleTempLogin = () => {
-    // 실제 JWT 토큰이 아닌, 임시 값을 사용합니다.
-    // 백엔드에서 유효한 토큰을 받아오거나, 임시로 설정한 토큰으로 대체하세요.
     const tempToken = 'YOUR_TEMPORARY_JWT_TOKEN_HERE_FOR_DEVELOPMENT_ONLY';
     localStorage.setItem('userToken', tempToken);
-    alert('임시 로그인 성공! 메인 페이지로 이동합니다.');
-    navigate('/');
+    setAlertMessage('임시 로그인 성공! 메인 페이지로 이동합니다.');
+    setTimeout(() => navigate('/'), 1000);
   };
-  // ★★★ 임시 로그인 함수 추가 끝 ★★★
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
+    setFormData({ name: '', email: '', password: '', confirmPassword: '' });
     setEmailError('');
   };
 
@@ -141,7 +123,7 @@ function AuthPage() {
               <label>성함</label>
               <input
                 type="text"
-                name="name" // username으로 사용될 필드
+                name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
@@ -192,13 +174,11 @@ function AuthPage() {
           </button>
         </form>
 
-        {/* ★★★ 임시 로그인 버튼 추가 ★★★ */}
         {isLogin && (
           <button type="button" onClick={handleTempLogin} className="temp-login-btn">
             임시 로그인 (개발용)
           </button>
         )}
-        {/* ★★★ 임시 로그인 버튼 추가 끝 ★★★ */}
 
         <div className="toggle-section">
           <p>
@@ -209,6 +189,11 @@ function AuthPage() {
           </p>
         </div>
       </div>
+
+      {/* 💡 커스텀 알림창 */}
+      {alertMessage && (
+        <CustomAlert message={alertMessage} onClose={() => setAlertMessage('')} />
+      )}
     </div>
   );
 }
