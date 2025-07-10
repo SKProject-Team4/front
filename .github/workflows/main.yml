@@ -52,18 +52,14 @@ jobs:
 
       # 4. Docker 이미지 메타데이터 설정
       # Docker 이미지에 대한 태그, 레이블 등의 메타데이터를 생성합니다.
-      # 여기서는 DOCKER_IMAGE와 DOCKER_TAG를 사용하여 태그를 명시적으로 설정합니다.
+      # 이제 DOCKER_TAG만 사용하여 태그를 명시적으로 설정합니다.
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE }}
           tags: |
-            ${{ env.DOCKER_TAG }} # 명시적으로 지정한 태그 사용
-            type=raw,value=latest,enable={{is_default_branch}} # 기본 브랜치(예: main)에 푸시될 때 latest 태그
-            type=sha,format=long,prefix=sha- # 커밋 SHA 기반 태그 (예: sha-abcdef123456)
-            type=ref,event=branch # 브랜치 이름을 태그로 사용 (예: main, jongwon)
-            # type=ref,event=tag # Git 태그 이름을 Docker 이미지 태그로 사용 (예: v1.0.0, 0.1)
+            ${{ env.DOCKER_TAG }} # 명시적으로 지정한 태그만 사용
 
       # 5. Docker 이미지 빌드 및 푸시
       # Dockerfile을 사용하여 이미지를 빌드하고, 설정된 레지스트리에 푸시합니다.
