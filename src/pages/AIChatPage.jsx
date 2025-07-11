@@ -9,6 +9,12 @@ const AIChatPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
+  const {
+    question,
+    startDate,
+    endDate,
+    selectedRegion,
+} = location.state || {};
 
   // 이전 페이지에서 전달된 초기 질문을 받습니다.
   const initialQuestion = state?.question || '질문이 전달되지 않았습니다.';
@@ -17,10 +23,7 @@ const AIChatPage = () => {
   // const initialAIAnswer = AIService.getInitialAIResponse(initialQuestion);
 
   // 채팅 메시지 상태 (사용자 메시지와 AI 메시지 포함)
-  const [messages, setMessages] = useState([
-    { role: 'user', text: initialQuestion },
-    // { role: 'ai', text: initialAIAnswer }
-  ]);
+  const [messages, setMessages] = useState([]);
   // AI가 추출한 장소 목록
   const [places, setPlaces] = useState([]);
   // 사용자가 선택한 장소 목록
@@ -37,6 +40,7 @@ const AIChatPage = () => {
   const [chatUid, setChatUid] = useState(null);
   // 커스텀 알림창 메시지
   const [alertMessage, setAlertMessage] = useState('');
+  const [redirectPath, setRedirectPath] = useState(null);
   // 메시지 전송 중인지 여부 (중복 전송 방지 및 로딩 표시)
   const [isSending, setIsSending] = useState(false);
 
@@ -60,21 +64,21 @@ const AIChatPage = () => {
     const fetchData = async () => {
       try {
         const chat_id = await AIService.createChatSession();
-        setChatUid(chat_id); // chatUid 상태를 업데이트
+        console.log('챗 아이디 :', chat_id);
+        setChatUid(chat_id);
       } catch (error) {
         console.error('에러 발생:', error);
       }
     };
 
     fetchData();
-  }, []); // 컴포넌트 최초 마운트 시 1번 실행
+  }, []); // ✅ 의존성 배열을 빈 배열로 고정!
 
   useEffect(() => {
-    if (chatUid !== null) {
-      handleSend(); // chatUid가 설정되었을 때만 실행
+    if (initialQuestion && chatUid !== null) {
+      sendInitialQuestion(); // 👈 따로 만든 함수 사용!
     }
-  }, [chatUid]); // chatUid 변경 시 실행
-
+  }, [chatUid]);
 
   // 로그인된 사용자인지 확인
   const isLoggedInUser = (() => {
@@ -177,16 +181,46 @@ const AIChatPage = () => {
     }
   };
 
-  // 캘린더에 저장 기능 (로그인 필요)
-  const handleSaveToCalendar = () => {
-    if (!isLoggedInUser) {
-      setAlertMessage('로그인이 필요해요! 😿');
-      return;
+  const sendInitialQuestion = async () => {
+    if (!initialQuestion || isSending) return;
+
+    const userMsg = { role: 'user', text: initialQuestion };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsSending(true);
+    setMessages((prev) => [...prev, { role: 'ai', text: '' }]);
+
+    try {
+      await AIService.sendMessageToAI(initialQuestion, chatUid, handleAIResponseUpdate);
+    } catch (error) {
+      console.error("초기 질문 전송 실패:", error);
+      setMessages((prev) => prev.map((msg, idx) =>
+        idx === prev.length - 1 && msg.role === 'ai'
+          ? { ...msg, text: "AI 응답 생성 중 오류가 발생했어요. 다시 시도해주세요." }
+          : msg
+      ));
+    } finally {
+      setIsSending(false);
     }
-    setAlertMessage('캘린더에 저장했어요! 🗓️');
-    // 실제 백엔드 연동 로직은 여기에 구현 예정
-    // 예: axios.post('/api/calendar/save', { messages }, { headers: { Authorization: `Bearer ${token}` } });
   };
+
+  const handleSavePlan = async () => {
+    const aiText = messages.findLast((msg) => msg.role === 'ai')?.text || 'AI 응답 없음';
+    const title = `${selectedRegion || '여행지'} 여행 계획`; // 또는 사용자 입력
+    const startISO = new Date(startDate).toISOString().split('T')[0];
+    const endISO = new Date(endDate).toISOString().split('T')[0];
+    const token = localStorage.getItem('userToken');
+    const guestKey = token ? null : '게스트-키-예시';
+
+    try {
+      const result = await AIService.savePlan(title, aiText, startISO, endISO, chatUid, guestKey);
+      setAlertMessage('📅 캘린더에 저장했어요! 홈으로 돌아갈게요~ 🏠');
+      setRedirectPath('/'); // ✅ 확인 누르면 홈으로!
+    } catch (e) {
+      setAlertMessage('❌ 저장 실패: ' + e.message);
+    }
+  };
+
+
 
   // PDF로 저장 기능 (기능 추가 예정 알림)
   const handleSaveAsPDF = () => {
@@ -292,7 +326,7 @@ const AIChatPage = () => {
             <button className="options-button" onClick={() => setShowOptions((prev) => !prev)}>⋮</button>
             {showOptions && (
               <div className="options-dropdown">
-                <button onClick={handleSaveToCalendar}>캘린더에 저장하기</button>
+                <button onClick={handleSavePlan}>캘린더에 저장하기</button>
                 <button onClick={handleSaveAsPDF}>PDF로 저장하기</button>
                 <button onClick={handleSaveAsJPG}>JPG로 저장하기</button>
               </div>
@@ -305,7 +339,13 @@ const AIChatPage = () => {
       {alertMessage && (
         <CustomAlert
           message={alertMessage}
-          onClose={() => setAlertMessage('')}
+          onClose={() => {
+            setAlertMessage('');
+            if (redirectPath) {
+              navigate(redirectPath);
+              setRedirectPath(null); // ✅ 이동 경로 초기화
+            }
+          }}
         />
       )}
     </div>

@@ -1,6 +1,7 @@
 // 백엔드 API의 기본 URL을 여기에 설정해주세요!
 // 이 변수는 이제 직접적인 API 호출에 사용되지 않고, 프록시 설정의 가이드라인으로만 남겨둡니다.
 // 실제 요청은 Vite 프록시를 통해 상대 경로로 이루어집니다.
+let cachedChatId = null;
 
 const AIService = {
   // 초기 AI 응답을 제공하는 함수 (제거됨)
@@ -28,6 +29,7 @@ const AIService = {
 
   // 💡 새로운 채팅 세션을 생성하는 함수 추가
   createChatSession: async () => {
+    if (cachedChatId) return cachedChatId;
     const token = localStorage.getItem('userToken');
 
     if (!token) {
@@ -186,7 +188,47 @@ const AIService = {
       console.error('AI 응답 생성 중 오류:', error);
       return 'AI 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.';
     }
+  },
+
+  savePlan: async (title, aiChatContent, startDate, endDate, chat_id = null, guestKey = null) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      const url = guestKey ? `/plans/save?guestKey=${guestKey}` : `/plans/save`;
+
+      const payload = {
+        title,
+        aiChatContent,
+        start: `${startDate}T00:00:00`,
+        end: `${endDate}T23:59:59`,
+        ...(chat_id && { chat_id })
+      };
+
+      console.log('📤 저장 요청 payload:', payload);
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('일정 저장 실패:', data);
+        throw new Error(data.message || '일정 저장 중 오류 발생!');
+      }
+
+      console.log('🟢 일정 저장 성공:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ 일정 저장 오류:', error);
+      throw error;
+    }
   }
+
 };
 
 export default AIService;

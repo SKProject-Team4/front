@@ -63,7 +63,7 @@ function AuthPage() {
       }
 
       // 이메일 형식 유효성 검사만 수행 (중복 확인은 백엔드에서 처리)
-      const emailFormatValidationMessage = validateEmailFormat(email);
+      const emailFormatValidationMessage = validateEmailFormat(formData.name);
       if (emailFormatValidationMessage) {
         setEmailError(emailFormatValidationMessage);
         return;

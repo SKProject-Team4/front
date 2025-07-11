@@ -95,7 +95,12 @@ const StartPlanningPage = () => {
 
     const question = `${formatDate(startDate)}부터 ${formatDate(endDate)}까지 ${people || '여러'}명이 ${selectedRegion || '어딘가'}로 ${transport || '알맞은 교통수단으로'} 여행을 가려고 해. ${keywords.length > 0 ? `${keywords.join(', ')} 같은 키워드에 맞는 장소` : '좋은 여행지'}를 추천해줄래?`;
     navigate('/ai-chat', {
-      state: { question }
+      state: { 
+        question,
+        startDate,
+        endDate,
+        selectedRegion,
+       }
     });
   };
 
