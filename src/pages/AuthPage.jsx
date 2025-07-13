@@ -124,30 +124,30 @@ function AuthPage() {
         <form onSubmit={handleSubmit} className="form">
           {!isLogin && (
             <div className="input-group">
-              <label>이메일</label> {/* 레이블 변경 */}
+              <label>성함 (사용자 이름)</label>
               <input
-                type="email"
-                name="name" // 백엔드 UserDTO의 username에 매핑
-                value={formData.name}
+                type="text"
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
                 required
               />
-            {/* 이메일 형식 오류 메시지 표시 */}
-            {!isLogin && emailError && (
-              <p className="error-message">{emailError}</p>
-            )}
             </div>
           )}
 
           <div className="input-group">
-            <label>성함 (사용자 이름)</label>
+            <label>이메일</label> {/* 레이블 변경 */}
             <input
-              type="text"
-              name="email"
-              value={formData.email}
+              type="email"
+              name="name" // 백엔드 UserDTO의 username에 매핑
+              value={formData.name}
               onChange={handleInputChange}
               required
             />
+          {/* 이메일 형식 오류 메시지 표시 */}
+          {!isLogin && emailError && (
+            <p className="error-message">{emailError}</p>
+          )}
           </div>
 
           <div className="input-group">

@@ -208,21 +208,26 @@ const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
-        setIsDropdownOpen(false);
-      }
+      setTimeout(() => {
+        if (
+          dropdownRef.current &&
+          !dropdownRef.current.contains(event.target) &&
+          menuRef.current &&
+          !menuRef.current.contains(event.target)
+        ) {
+          setIsDropdownOpen(false); // ✅ 진짜 바깥 클릭만 감지
+        }
+      }, 100); // 약간의 딜레이를 줘야 제대로 인식돼!
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
-  }, []);
+  }, [isDropdownOpen]);
 
   const handleDeletePlan = async (id) => {
     try {
@@ -371,7 +376,7 @@ const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
                 더보기
               </button>
               {isDropdownOpen && (
-                <ul className="action-dropdown-menu" ref={menuRef}>
+                <ul className="action-dropdown-menu show-dropdown" ref={menuRef}>
                   <li
                     onClick={() =>
                       onNavigateToAIChat && onNavigateToAIChat(selectedDate)
