@@ -367,8 +367,8 @@ const AIChatPage = () => {
             {showOptions && (
               <div className="options-dropdown">
                 <button onClick={handleSavePlan}>캘린더에 저장하기</button>
-                <button onClick={handleSaveAsPDF}>PDF로 저장하기</button> {/* PDF 저장 버튼 */}
                 <button onClick={handleSaveAsJPG}>JPG로 저장하기</button> {/* JPG 저장 버튼 */}
+                <button onClick={handleSaveAsPDF}>PDF로 저장하기</button> {/* PDF 저장 버튼 */}
               </div>
             )}
           </div>

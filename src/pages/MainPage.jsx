@@ -103,11 +103,11 @@ const MainPage = () => {
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="top-right-buttons-container">
-        <button type="button" onClick={handleMyPageClick} className="top-bar-button">
+        {/* <button type="button" onClick={handleMyPageClick} className="top-bar-button">
           마이페이지
-        </button>
+        </button> */}
         <button type="button" onClick={handleAuthClick} className="top-bar-button">
-          {isLoggedIn || !isGuest ? '로그아웃' : '로그인'}
+          {isLoggedIn ? '로그아웃' : '로그인'}
         </button>
       </div>
 
@@ -118,7 +118,7 @@ const MainPage = () => {
       <div className="main-content">
         <p className="main-catchphrase-text title-text">"여행이 쉬워진다, AI와 함께라면."</p>
 
-        {(isLoggedIn || !isGuest) ? (
+        {isLoggedIn ? (
           // 로그인 또는 게스트 상태일 때 캘린더 표시
           <Calendar 
             onNavigateToAIChat={handleNavigateToAIChat} 

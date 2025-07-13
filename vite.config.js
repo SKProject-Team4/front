@@ -8,17 +8,17 @@ export default defineConfig({
     // 백엔드 Spring Boot 애플리케이션으로 API 요청을 프록시합니다.
     proxy: {
       '/api': { // '/api'로 시작하는 모든 요청을 프록시합니다.
-        target: '', // 백엔드 서버 주소
+        target: 'http://server.plannerai.kro.kr/spring/', // 백엔드 서버 주소
         changeOrigin: true, // 대상 서버의 호스트 헤더를 변경합니다.
         // rewrite: (path) => path.replace(/^\/api/, ''), // '/api' 접두사를 제거하고 전달합니다.
       },
       // Calendar.jsx에서 /plans와 같이 /api 접두사 없이 직접 호출하는 경우를 위해 추가
       '/plans': {
-        target: '',
+        target: 'http://server.plannerai.kro.kr/spring/',
         changeOrigin: true,
       },
       '/chat': {
-        target: '',
+        target: 'http://server.plannerai.kro.kr/fastapi/',
         changeOrigin: true,
       },
       // 만약 다른 최상위 경로 API (예: /logout)가 있다면 여기에 추가합니다.
