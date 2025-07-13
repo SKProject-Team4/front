@@ -4,6 +4,8 @@ import './AIChatPage.css'; // CSS 파일 경로는 프로젝트 구조에 맞게
 import Logo from "../components/Logo"; // Logo 컴포넌트 경로 확인
 import CustomAlert from "../components/CustomAlert"; // CustomAlert 컴포넌트 경로 확인
 import AIService from '../services/AIService'; // AIService 경로 확인
+import html2pdf from "html2pdf.js";
+import html2canvas from "html2canvas";
 
 const AIChatPage = () => {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ const AIChatPage = () => {
   const [redirectPath, setRedirectPath] = useState(null);
   // 메시지 전송 중인지 여부 (중복 전송 방지 및 로딩 표시)
   const [isSending, setIsSending] = useState(false);
+
 
   // messages 상태가 업데이트될 때마다 스크롤을 최하단으로 이동
   useEffect(() => {
@@ -228,16 +231,46 @@ const AIChatPage = () => {
   };
 
 
-
-  // PDF로 저장 기능 (기능 추가 예정 알림)
+  // PDF로 저장 기능 구현 (전체 화면 캡처)
   const handleSaveAsPDF = () => {
-    setAlertMessage('PDF로 저장했어요! 📝 (기능 추가 예정)');
+    // 전체 화면을 캡처하려면 document.documentElement (<html>) 또는 document.body를 사용합니다.
+    const element = document.documentElement; 
+    if (element) {
+      // 파일 이름 생성 (예: 'AI_Chat_Screen_2025-07-13.pdf')
+      const filename = `AI_Chat_Screen_${new Date().toISOString().split('T')[0]}.pdf`;
+      html2pdf()
+        .from(element)
+        .set({
+          margin: 0.5, // 여백 조정
+          filename: filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true }, // useCORS 추가 (이미지 로딩 문제 방지)
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        })
+        .save();
+      setAlertMessage('화면을 PDF로 저장했어요! 📝');
+    } else {
+      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+    }
   };
 
-  // JPG로 저장 기능 (기능 추가 예정 알림)
-  const handleSaveAsJPG = () => {
-    setAlertMessage('JPG로 저장했어요! 🖼️ (기능 추가 예정)');
+  // JPG로 저장 기능 구현 (전체 화면 캡처)
+  const handleSaveAsJPG = async () => {
+    // 전체 화면을 캡처하려면 document.documentElement (<html>) 또는 document.body를 사용합니다.
+    const element = document.documentElement; 
+    if (element) {
+      const canvas = await html2canvas(element, { useCORS: true }); // useCORS 추가
+      const link = document.createElement("a");
+      // 파일 이름 생성 (예: 'AI_Chat_Screen_2025-07-13.jpg')
+      link.download = `AI_Chat_Screen_${new Date().toISOString().split('T')[0]}.jpg`;
+      link.href = canvas.toDataURL("image/jpeg");
+      link.click();
+      setAlertMessage('화면을 JPG로 저장했어요! 🖼️');
+    } else {
+      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+    }
   };
+
 
   return (
     <div className="chat-wrapper">
@@ -334,8 +367,8 @@ const AIChatPage = () => {
             {showOptions && (
               <div className="options-dropdown">
                 <button onClick={handleSavePlan}>캘린더에 저장하기</button>
-                <button onClick={handleSaveAsPDF}>PDF로 저장하기</button>
-                <button onClick={handleSaveAsJPG}>JPG로 저장하기</button>
+                <button onClick={handleSaveAsPDF}>PDF로 저장하기</button> {/* PDF 저장 버튼 */}
+                <button onClick={handleSaveAsJPG}>JPG로 저장하기</button> {/* JPG 저장 버튼 */}
               </div>
             )}
           </div>
