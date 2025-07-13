@@ -200,7 +200,7 @@ const AIService = {
         aiChatContent,
         start: `${startDate}T00:00:00`,
         end: `${endDate}T23:59:59`,
-        ...(chat_id && { chat_id })
+        chatId: chat_id
       };
 
       console.log('📤 저장 요청 payload:', payload);
@@ -227,8 +227,31 @@ const AIService = {
       console.error('❌ 일정 저장 오류:', error);
       throw error;
     }
-  }
+  },
 
+  getChatHistory: async (chatId) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      const response = await fetch(`/chat/get_chat/${chatId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`채팅 히스토리 불러오기 실패: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('📥 불러온 채팅 히스토리:', data);
+      return data; // [{ role: 'user', content: '...' }, { role: 'ai', content: '...' }]
+    } catch (error) {
+      console.error('❌ 채팅 히스토리 불러오기 오류:', error);
+      throw error;
+    }
+  }
 };
 
 export default AIService;

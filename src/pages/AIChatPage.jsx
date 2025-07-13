@@ -78,10 +78,36 @@ const AIChatPage = () => {
   }, []); // ✅ 의존성 배열을 빈 배열로 고정!
 
   useEffect(() => {
-    if (initialQuestion && chatUid !== null) {
+    if (initialQuestion && chatUid !== null && !state?.chatId) {
       sendInitialQuestion(); // 👈 따로 만든 함수 사용!
     }
   }, [chatUid]);
+
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      if (state?.chatId) {
+        try {
+          const history = await AIService.getChatHistory(state.chatId);
+          console.log("이전 대화 불러오기 성공 🎉", history);
+
+          const parsedMessages = history.data.map((msg) => ({
+            role: msg.type === 'human' ? 'user' : 'ai',
+            text: msg.msg,
+          }));
+
+          console.log("no 문제");
+          setMessages(parsedMessages);
+          setChatUid(state.chatId); // 기존 chatUid도 설정해줘야 나중에 이어서 채팅됨!
+          setShowPlaceSelector(false); // 장소 선택 UI 안 뜨게
+        } catch (error) {
+          console.error("이전 대화 불러오기 실패 😢", error);
+          setAlertMessage('이전 대화를 불러오는 데 실패했어요.');
+        }
+      }
+    };
+
+    fetchChatHistory();
+  }, [state?.chatId]);
 
   // 로그인된 사용자인지 확인
   const isLoggedInUser = (() => {
@@ -209,8 +235,12 @@ const AIChatPage = () => {
   const handleSavePlan = async () => {
     const aiText = messages.findLast((msg) => msg.role === 'ai')?.text || 'AI 응답 없음';
     const title = `${selectedRegion || '여행지'} 여행 계획`; // 또는 사용자 입력
-    const startISO = new Date(startDate).toISOString().split('T')[0];
-    const endISO = new Date(endDate).toISOString().split('T')[0];
+    const newStartDate = new Date(startDate);
+    newStartDate.setDate(newStartDate.getDate() + 1);
+    const startISO = newStartDate.toISOString().split('T')[0];
+    const newEndDate = new Date(endDate);
+    newEndDate.setDate(newEndDate.getDate() + 1);
+    const endISO = newEndDate.toISOString().split('T')[0];
     const token = localStorage.getItem('userToken');
     const guestKey = token ? null : '게스트-키-예시';
 
@@ -230,7 +260,6 @@ const AIChatPage = () => {
       setAlertMessage('❌ 저장 실패: ' + e.message);
     }
   };
-
 
   // PDF로 저장 기능 구현 (전체 화면 캡처)
   const handleSaveAsPDF = () => {
@@ -393,16 +422,17 @@ const AIChatPage = () => {
               setAlertMessage('');
               setShowConfirmAlert(false);
               if (redirectPath) {
+                console.log("✅ 이동 시도:", redirectPath);
                 navigate(redirectPath);
                 setRedirectPath(null);
               }
             }}
-            onCancel={() => {
+            onCancel={showConfirmAlert ? () => {
               setAlertMessage('');
               setRedirectPath(null);
               setShowConfirmAlert(false);
-            }}
-            showCancel={true}
+            } : undefined}
+            showCancel={showConfirmAlert}
           />
         ) : (
           <CustomAlert
@@ -410,6 +440,11 @@ const AIChatPage = () => {
             onClose={() => {
               setAlertMessage('');
               setShowConfirmAlert(false);
+              if (redirectPath) {
+                console.log("✅ 이동 시도:", redirectPath);
+                navigate(redirectPath);
+                setRedirectPath(null);
+              }
             }}
           />
         )

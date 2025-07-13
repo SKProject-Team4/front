@@ -79,6 +79,7 @@ const CalendarService = {
     if (contentType && contentType.includes("application/json")) {
       try {
         const data = await response.json();
+        console.log("service data:", data);
         return data;
       } catch (jsonError) {
         console.error('getPlanDetails 응답 JSON 파싱 오류:', jsonError);

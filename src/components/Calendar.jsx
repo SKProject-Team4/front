@@ -10,23 +10,25 @@ import { addDays, format } from "date-fns";
 import * as dateFnsTz from "date-fns-tz";
 import html2pdf from "html2pdf.js";
 import html2canvas from "html2canvas";
+import { useNavigate } from 'react-router-dom';
 
 const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
   const { utcToZonedTime } = dateFnsTz;
-
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [chatContent, setChatContent] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const menuRef = useRef(null);
-
+  
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [planDetails, setPlanDetails] = useState([]);
   const [showConfirmAlert, setShowConfirmAlert] = useState(false);
-
+  
   const [alertMessage, setAlertMessage] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -115,12 +117,14 @@ const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
         title: data.title,
         start: data.start,
         end: data.end,
+        chatId: data.chatId,
         extendedProps: {
           description: data.message,
           originalStart: data.start,
           originalEnd: data.end,
         },
       });
+      console.log("data:", data);
       setPlanDetails(data.aiChatContent || []);
     } catch (err) {
       console.error("세부 일정 로딩 실패:", err);
@@ -167,6 +171,17 @@ const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
       fetchPlanDetails(clickedPlanId);
     }
     setIsModalOpen(true);
+  };
+
+  const handleChatHistoryClick = (chatId) => {
+    if (!chatId) {
+      setAlertMessage("저장된 채팅이 없어요! 💬");
+      return;
+    }
+
+    navigate('/ai-chat', {
+      state: { chatId }, // ✅ ChatHistoryPage로 이동!
+    });
   };
 
   const fetchAIChatContent = async (date) => {
@@ -377,11 +392,7 @@ const Calendar = ({ onNavigateToAIChat, isLoggedIn }) => {
               </button>
               {isDropdownOpen && (
                 <ul className="action-dropdown-menu show-dropdown" ref={menuRef}>
-                  <li
-                    onClick={() =>
-                      onNavigateToAIChat && onNavigateToAIChat(selectedDate)
-                    }
-                  >
+                  <li onClick={() => handleChatHistoryClick(selectedPlan.chatId)}>
                     <span className="bullet-point"></span> 채팅 내역 보기
                   </li>
                   <li onClick={handleSaveAsJPG}>

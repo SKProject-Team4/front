@@ -25,7 +25,7 @@ function AuthPage() {
       ...prev,
       [name]: value
     }));
-    if (name === 'email') {
+    if (name === 'name') {
       setEmailError(''); // 이메일 입력 시 오류 메시지 초기화
     }
   };
@@ -44,7 +44,7 @@ function AuthPage() {
     if (isLogin) {
       // AuthService.login은 { success: true, message: '...', token: '...' } 또는 { success: false, message: '...' } 반환
       // 백엔드 LoginFilter는 'username' 필드를 기대하므로, 이메일을 username으로 전달합니다.
-      const result = await AuthService.login(formData.email, formData.password); 
+      const result = await AuthService.login(formData.name, formData.password); 
 
       if (result.success) {
         // 토큰 저장은 AuthService.login 내부에서 이미 처리됩니다.
@@ -78,7 +78,6 @@ function AuthPage() {
         setIsLogin(true); // 회원가입 성공 후 로그인 폼으로 전환
         setFormData({ name: '', email: '', password: '', confirmPassword: '' }); // 폼 초기화
       } else {
-        // 백엔드에서 중복 등의 이유로 실패 메시지를 반환할 경우 처리
         setAlertMessage('회원가입 실패: ' + registerResult.message);
         console.error('회원가입 실패 (AuthPage):', registerResult.message);
       }
