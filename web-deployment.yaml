@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment # 배포의 이름
+  labels:
+    app: web-app # 이 배포에 속하는 파드에 적용될 레이블
+spec:
+  replicas: 1 # 실행할 파드의 개수 (필요에 따라 조정 가능)
+  selector:
+    matchLabels:
+      app: web-app # 이 배포가 관리할 파드를 선택하는 기준
+  template:
+    metadata:
+      labels:
+        app: web-app # 파드에 적용될 레이블
+    spec:
+      containers:
+        - name: web # 컨테이너 이름
+          image: gcr.io/YOUR_PROJECT_ID/web-app:latest # Docker Hub 또는 GCR에 푸시된 이미지 경로로 변경하세요.
+          ports:
+            - containerPort: 5000 # 컨테이너가 노출할 포트
+          env: # 환경 변수 설정
+            - name: REDIS_HOST
+              value: redis-service # Redis 서비스의 이름 (쿠버네티스 내부 DNS)
+            - name: REDIS_PORT
+              value: "6379" # Redis 서비스의 포트
+          resources: # 컨테이너에 할당할 리소스 (선택 사항)
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      restartPolicy: Always # 파드 재시작 정

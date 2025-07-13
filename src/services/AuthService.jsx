@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 🚨 백엔드 API의 기본 URL을 여기에 설정해주세요!
-const API_BASE_URL = 'http://localhost:8099';
+// 백엔드 Spring Boot 애플리케이션이 실행되는 포트(8099)로 변경했습니다.
 
 // 임시 로그인 토큰 (개발용)
 const TEMP_LOGIN_TOKEN = 'YOUR_TEMPORARY_JWT_TOKEN_HERE_FOR_DEVELOPMENT_ONLY';
@@ -9,7 +9,47 @@ const TEMP_LOGIN_TOKEN = 'YOUR_TEMPORARY_JWT_TOKEN_HERE_FOR_DEVELOPMENT_ONLY';
 const GUEST_PLANNING_KEY = 'guest-planning-key-12345'; // <-- 이 키를 사용합니다.
 
 const AuthService = {
-  // ... (기존 checkEmailDuplicate, login, register 함수는 그대로 유지) ...
+  // 사용자 로그인
+  login: async (username, password) => {
+    try {
+      // API_BASE_URL 대신 상대 경로 '/api/users/login' 사용
+      const response = await axios.post(`/api/users/login`, { username, password }, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      // 백엔드 LoginFilter에서 Authorization 헤더로 토큰을 반환하므로, 이를 저장합니다.
+      console.log(response.config.url)
+      const token = response.headers.authorization; 
+      if (token) {
+        localStorage.setItem('userToken', token.replace('Bearer ', '')); // "Bearer " 접두사 제거 후 저장
+        console.log('로그인 성공, 토큰 저장:', token);
+        // 성공 시 구조화된 객체 반환
+        return { success: true, message: response.data, token: token.replace('Bearer ', '') };
+      } else {
+        // 토큰이 없는 경우 (백엔드 로직에 따라 다름)
+        return { success: false, message: "로그인 성공했으나 토큰을 받지 못했습니다." };
+      }
+    } catch (error) {
+      console.error('로그인 실패:', error.response?.data || error.message);
+      // 실패 시 구조화된 객체 반환
+      return { success: false, message: error.response?.data?.message || error.message };
+    }
+  },
+
+  // 사용자 등록 (회원가입)
+  register: async (username, email, password) => {
+    try {
+      // API_BASE_URL 대신 상대 경로 '/api/users/register' 사용
+      const response = await axios.post(`/api/users/register`, { username, email, password }, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      // 성공 시 구조화된 객체 반환
+      return { success: true, message: response.data }; // "register OK" 또는 다른 성공 메시지
+    } catch (error) {
+      console.error('회원가입 실패:', error.response?.data || error.message);
+      // 실패 시 구조화된 객체 반환
+      return { success: false, message: error.response?.data?.message || error.message };
+    }
+  },
 
   // 로그인 상태 확인
   checkLoginStatus: async () => {
@@ -30,15 +70,16 @@ const AuthService = {
     // 실제 JWT 토큰이 있는 경우
     if (token) {
       try {
-        console.log('로그인 상태 확인 API 호출 시도:', `${API_BASE_URL}/users/logincheck`);
-        const response = await axios.get(`${API_BASE_URL}/users/logincheck`, {
+        // API_BASE_URL 대신 상대 경로 '/api/users/logincheck' 사용
+        console.log('로그인 상태 확인 API 호출 시도:', `/api/users/logincheck`);
+        const response = await axios.get(`/api/users/logincheck`, {
           headers: {
             'Authorization': `Bearer ${token}`, // JWT 토큰 포함
             'Content-Type': 'application/json'
           }
         });
-
-        if (response.data.status === 'users' && response.data.code === 200 && response.data.login === true) {
+        console.log(response.data)
+        if (response.data.status === 'users' ) {
           console.log('로그인 상태 확인: 사용자 로그인됨 (실제 토큰)');
           return { isLoggedIn: true, isGuest: false, message: '로그인됨' };
         } else {
@@ -76,12 +117,14 @@ const AuthService = {
 
     try {
       console.log('로그아웃 API 호출 시도...');
-      const response = await axios.get(`${API_BASE_URL}/logout`, {
+      // API_BASE_URL 대신 상대 경로 '/logout' 사용 (vite.config.js에 프록시 설정 필요)
+      const response = await axios.get(`/api/users/logout`, { // POST 요청으로 변경, 빈 본문 추가
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-
+      console.log(response)
       if (response.status === 200 && response.data.status === 'success') {
         localStorage.removeItem('userToken');
         return { success: true, message: '로그아웃 되었습니다.' };

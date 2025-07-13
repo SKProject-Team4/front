@@ -12,7 +12,7 @@ function App() {
         {/* '/main' 경로는 MainPage */}
         <Route path="/" element={<MainPage />} />
         {/* 루트 경로 '/'는 AuthPage */}
-        <Route path="/login" element={<AuthPage />} /> 
+        <Route path="/api/users/login" element={<AuthPage />} /> 
         {/* '/start-planning-page' 경로는 StartPlanningPage */}
         <Route path="/start-planning" element={<StartPlanningPage />} />
         {/* '/ai-chat' 경로는 AIChatPage */}

@@ -238,6 +238,31 @@
   animation: fadeOut 0.4s ease-in-out forwards;
 }
 
+/* AIChatPage.css 예시 */
+.loading-dots span {
+  animation: blink 1s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.chat-input input:disabled,
+.chat-input button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

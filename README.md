@@ -19,3 +19,6 @@ Currently, two official plugins are available:
 - npm install react-leaflet leaflet
 - npm install lucide-react
 - npm install axios
+- npm install date-fns-tz
+- npm install html2pdf.js
+- npm install html2canvas
