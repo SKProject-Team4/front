@@ -45,7 +45,7 @@ const AIChatPage = () => {
   const [redirectPath, setRedirectPath] = useState(null);
   // 메시지 전송 중인지 여부 (중복 전송 방지 및 로딩 표시)
   const [isSending, setIsSending] = useState(false);
-
+  const [showConfirmAlert, setShowConfirmAlert] = useState(false);
 
   // messages 상태가 업데이트될 때마다 스크롤을 최하단으로 이동
   useEffect(() => {
@@ -223,6 +223,7 @@ const AIChatPage = () => {
       }
       else{
         setAlertMessage('로그인을 해주세요.');
+        setShowConfirmAlert(true);
         setRedirectPath('/api/users/login'); // ✅ 확인 누르면 로그인 창으로!
       }
     } catch (e) {
@@ -233,44 +234,52 @@ const AIChatPage = () => {
 
   // PDF로 저장 기능 구현 (전체 화면 캡처)
   const handleSaveAsPDF = () => {
-    // 전체 화면을 캡처하려면 document.documentElement (<html>) 또는 document.body를 사용합니다.
-    const element = document.documentElement; 
-    if (element) {
-      // 파일 이름 생성 (예: 'AI_Chat_Screen_2025-07-13.pdf')
+    const element = document.documentElement;
+    if (!element) {
+      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
       const filename = `AI_Chat_Screen_${new Date().toISOString().split('T')[0]}.pdf`;
       html2pdf()
         .from(element)
         .set({
-          margin: 0.5, // 여백 조정
-          filename: filename,
+          margin: 0.5,
+          filename,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true }, // useCORS 추가 (이미지 로딩 문제 방지)
+          html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
         })
         .save();
       setAlertMessage('화면을 PDF로 저장했어요! 📝');
-    } else {
-      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+    } catch (error) {
+      console.error('PDF 저장 실패:', error);
+      setAlertMessage('PDF 저장 중 오류가 발생했어요 😭');
     }
   };
 
   // JPG로 저장 기능 구현 (전체 화면 캡처)
   const handleSaveAsJPG = async () => {
-    // 전체 화면을 캡처하려면 document.documentElement (<html>) 또는 document.body를 사용합니다.
-    const element = document.documentElement; 
-    if (element) {
-      const canvas = await html2canvas(element, { useCORS: true }); // useCORS 추가
+    const element = document.documentElement;
+    if (!element) {
+      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      const canvas = await html2canvas(element, { useCORS: true });
       const link = document.createElement("a");
-      // 파일 이름 생성 (예: 'AI_Chat_Screen_2025-07-13.jpg')
-      link.download = `AI_Chat_Screen_${new Date().toISOString().split('T')[0]}.jpg`;
+      const today = new Date().toISOString().split('T')[0];
+      link.download = `AI_Chat_Screen_${today}.jpg`;
       link.href = canvas.toDataURL("image/jpeg");
       link.click();
       setAlertMessage('화면을 JPG로 저장했어요! 🖼️');
-    } else {
-      setAlertMessage('저장할 화면 내용을 찾을 수 없습니다.');
+    } catch (error) {
+      console.error('JPG 저장 실패:', error);
+      setAlertMessage('JPG 저장 중 오류가 발생했어요 😢');
     }
   };
-
 
   return (
     <div className="chat-wrapper">
@@ -377,21 +386,33 @@ const AIChatPage = () => {
 
       {/* 커스텀 알림창 컴포넌트 */}
       {alertMessage && (
-        <CustomAlert
-          message={alertMessage}
-          onClose={() => {
-            setAlertMessage('');
-            if (redirectPath) {
-              navigate(redirectPath);
-              setRedirectPath(null); // ✅ 이동 경로 초기화
-            }
-          }}
-          onCancel={() => {
-            setAlertMessage('');
-            setRedirectPath(null); // ❗ 취소 누르면 리디렉션 안 하도록!
-          }}
-          showCancel={!isLoggedInUser} // ✅ 로그인 안한 경우만 '취소' 버튼 보여줘!
-        />
+        showConfirmAlert ? (
+          <CustomAlert
+            message={alertMessage}
+            onClose={() => {
+              setAlertMessage('');
+              setShowConfirmAlert(false);
+              if (redirectPath) {
+                navigate(redirectPath);
+                setRedirectPath(null);
+              }
+            }}
+            onCancel={() => {
+              setAlertMessage('');
+              setRedirectPath(null);
+              setShowConfirmAlert(false);
+            }}
+            showCancel={true}
+          />
+        ) : (
+          <CustomAlert
+            message={alertMessage}
+            onClose={() => {
+              setAlertMessage('');
+              setShowConfirmAlert(false);
+            }}
+          />
+        )
       )}
     </div>
   );
