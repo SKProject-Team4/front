@@ -1,18 +1,16 @@
 {
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
+      "source": "/api/(.)",
+      "destination": "http://spring.plannerai.kro.kr/api/$1"
+    },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "source": "/plans/(.)",
+      "destination": "http://spring.plannerai.kro.kr/plans/$1"
+    },
+    {
+      "source": "/chat/(.*)",
+      "destination": "http://fastapi.plannerai.kro.kr/chat/$1"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "API_URL": "https://your-backend-api.com/"
-  }
+  ]
 }
