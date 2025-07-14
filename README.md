@@ -38,6 +38,7 @@
 ---
 ## 화면설계
 <img width="1534" height="730" alt="image" src="https://github.com/user-attachments/assets/7c379a60-ddf1-461f-8abf-3a68e2b6acce" />
+
 > 주요 화면 흐름과 디자인은 위와 같습니다.
 > 메인 대시보드 (MainPage.jsx): 사용자의 전체 일정을 한눈에 볼 수 있는 달력 뷰와 다가오는 일정을 목록 형태로 제공합니다. 로그인한 사용자가 앱에 접속했을 때 가장 먼저 보게 되는 화면입니다.
 
@@ -66,19 +67,19 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 ## 주요 기능
 >사용자 인증 및 관리:
 
-회원가입: 이메일 및 비밀번호 기반의 안전한 사용자 계정 생성 기능을 제공합니다. (AuthPage.jsx, AuthService.jsx, UserService.jsx 연동)
+- 회원가입: 이메일 및 비밀번호 기반의 안전한 사용자 계정 생성 기능을 제공합니다. (AuthPage.jsx, AuthService.jsx, UserService.jsx 연동)
 
-로그인: 등록된 계정을 통해 애플리케이션에 안전하게 접속할 수 있습니다. (AuthPage.jsx, AuthService.jsx 연동)
+- 로그인: 등록된 계정을 통해 애플리케이션에 안전하게 접속할 수 있습니다. (AuthPage.jsx, AuthService.jsx 연동)
 
-마이페이지: 사용자 프로필 조회 및 정보 업데이트를 할 수 있습니다. (MyPage.jsx, UserService.jsx 연동)
+- 마이페이지: 사용자 프로필 조회 및 정보 업데이트를 할 수 있습니다. (MyPage.jsx, UserService.jsx 연동)
 
-개인 일정 관리:
+- 개인 일정 관리:
 
 일정 CRUD (생성, 조회, 수정, 삭제): 사용자가 개인의 일정을 자유롭게 생성하고 관리할 수 있습니다. (Calendar.jsx, PlanningService.jsx, CalendarService.jsx 연동)
 
-달력 뷰: FullCalendar를 통해 월/주/일 단위로 일정을 시각적으로 확인하고 관리할 수 있습니다. (Calendar.jsx)
+- 달력 뷰: FullCalendar를 통해 월/주/일 단위로 일정을 시각적으로 확인하고 관리할 수 있습니다. (Calendar.jsx)
 
-장소 기반 일정 관리: Leaflet 지도를 활용하여 일정에 특정 장소를 지정하고 시각적으로 확인할 수 있습니다. (RegionModal.jsx 연동)
+- 장소 기반 일정 관리: Leaflet 지도를 활용하여 일정에 특정 장소를 지정하고 시각적으로 확인할 수 있습니다. (RegionModal.jsx 연동)
 
 
 ---
@@ -90,6 +91,7 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 - React
 - Figma
 - Postman
+  
 *백엔드*
 
 - Spring
@@ -97,10 +99,12 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 - Postman
 - Python
 - Langchain
+  
 *데이터베이스*
 
 - redis
 - mysql
+  
 *버전 관리*
 
 - GitHub
