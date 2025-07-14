@@ -42,7 +42,7 @@ AI 기반 추천/보조 (선택적 기능):
 ---
 ## 화면설계
 <img width="1534" height="730" alt="image" src="https://github.com/user-attachments/assets/7c379a60-ddf1-461f-8abf-3a68e2b6acce" />
-> 주요 화면 흐름과 디자인은 위와 같다.
+> 주요 화면 흐름과 디자인은 위와 같습니다.
 >
 > 메인 대시보드 (MainPage.jsx): 사용자의 전체 일정을 한눈에 볼 수 있는 달력 뷰와 다가오는 일정을 목록 형태로 제공합니다. 로그인한 사용자가 앱에 접속했을 때 가장 먼저 보게 되는 화면입니다.
 
