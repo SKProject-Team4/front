@@ -39,7 +39,6 @@
 ## 화면설계
 <img width="1534" height="730" alt="image" src="https://github.com/user-attachments/assets/7c379a60-ddf1-461f-8abf-3a68e2b6acce" />
 > 주요 화면 흐름과 디자인은 위와 같습니다.
->
 > 메인 대시보드 (MainPage.jsx): 사용자의 전체 일정을 한눈에 볼 수 있는 달력 뷰와 다가오는 일정을 목록 형태로 제공합니다. 로그인한 사용자가 앱에 접속했을 때 가장 먼저 보게 되는 화면입니다.
 
 - 인증 화면 (AuthPage.jsx): 회원가입 및 로그인 기능을 담당합니다. 사용자 인증 정보를 입력받아 백엔드(AuthService.jsx와 연동)와 통신하며, 계정 생성 및 세션 관리를 수행합니다.
