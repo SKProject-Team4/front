@@ -5,12 +5,15 @@
 ## 화면설계
 <img width="1534" height="730" alt="image" src="https://github.com/user-attachments/assets/7c379a60-ddf1-461f-8abf-3a68e2b6acce" />
 > 주요 화면 흐름과 디자인은 위와 같다.
+
 ---
 ## 시스템 아키텍처
 >설명~~
+
 ---
 ## 주요 기능
 >설명~~
+
 ---
 ## 기술 스텍
 >본 시스템은 사용자 중심 설계 원칙에 따라 다음과 같은 기술 스택으로 개발되었습니다.
@@ -38,6 +41,7 @@
 - Google Docs
 - Chat gpt
 - Deepseek
+  
 ---
 ## 폴더 구조
 >설명~~
