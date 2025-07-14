@@ -1,24 +1,18 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-
-- npm install react-scripts
-- npm install react-router-dom
-- npm install react-datepicker
-- npm install date-fns
-- npm install react@latest
-- npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/timegrid @fullcalendar/interaction
--   이메일 = test@example.com
--   비밀번호 = password123
-- npm install react-leaflet leaflet
-- npm install lucide-react
-- npm install axios
-- npm install date-fns-tz
-- npm install html2pdf.js
-- npm install html2canvas
+# [SK쉴더스 루키즈 개발 트랙 3기]
+미니 프로젝트 3 - 플랜 메이트
+>설명~~
+---
+## 화면설계
+>설명~~
+---
+## 시스템 아키텍처
+>설명~~
+---
+## 주요 기능
+>설명~~
+---
+## 기술 스텍
+>설명~~
+---
+## 폴더 구조
+>설명~~
