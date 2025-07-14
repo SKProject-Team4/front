@@ -92,26 +92,12 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 - Figma
 - Postman
   
-*백엔드*
-
-- Spring
-- Java
-- Postman
-- Python
-- Langchain
-  
-*데이터베이스*
-
-- redis
-- mysql
-  
 *버전 관리*
 
 - GitHub
 - Notion
 - Google Docs
 - Chat gpt
-- Deepseek
   
 ---
 ## 폴더 구조
