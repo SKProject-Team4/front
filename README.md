@@ -50,8 +50,6 @@
 
 - AI 채팅 (AIChatPage.jsx): AI 챗봇과의 상호작용을 위한 페이지입니다. 사용자가 AI에 질문을 하거나 대화를 나눌 수 있는 UI를 제공하며, 백엔드 AI 서비스(AIService.jsx와 연동)와 통신하여 응답을 받습니다.
 
-- 마이페이지 (MyPage.jsx): 사용자 정보 관리, 알림 설정 등 개인화된 기능을 제공합니다.
-
 - 커스텀 알림 (CustomAlert.jsx): 시스템 메시지(성공, 에러, 경고 등)를 사용자에게 일관된 형태로 표시합니다
 
 
@@ -70,8 +68,6 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 - 회원가입: 이메일 및 비밀번호 기반의 안전한 사용자 계정 생성 기능을 제공합니다. (AuthPage.jsx, AuthService.jsx, UserService.jsx 연동)
 
 - 로그인: 등록된 계정을 통해 애플리케이션에 안전하게 접속할 수 있습니다. (AuthPage.jsx, AuthService.jsx 연동)
-
-- 마이페이지: 사용자 프로필 조회 및 정보 업데이트를 할 수 있습니다. (MyPage.jsx, UserService.jsx 연동)
 
 - 개인 일정 관리: 일정 CRUD (생성, 조회, 수정, 삭제): 사용자가 개인의 일정을 자유롭게 생성하고 관리할 수 있습니다. (Calendar.jsx, PlanningService.jsx, CalendarService.jsx 연동)
 
