@@ -73,9 +73,7 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 
 - 마이페이지: 사용자 프로필 조회 및 정보 업데이트를 할 수 있습니다. (MyPage.jsx, UserService.jsx 연동)
 
-- 개인 일정 관리:
-
-일정 CRUD (생성, 조회, 수정, 삭제): 사용자가 개인의 일정을 자유롭게 생성하고 관리할 수 있습니다. (Calendar.jsx, PlanningService.jsx, CalendarService.jsx 연동)
+- 개인 일정 관리: 일정 CRUD (생성, 조회, 수정, 삭제): 사용자가 개인의 일정을 자유롭게 생성하고 관리할 수 있습니다. (Calendar.jsx, PlanningService.jsx, CalendarService.jsx 연동)
 
 - 달력 뷰: FullCalendar를 통해 월/주/일 단위로 일정을 시각적으로 확인하고 관리할 수 있습니다. (Calendar.jsx)
 
@@ -91,6 +89,7 @@ Vercel을 통해 배포 및 호스팅되며, 자동 HTTPS, 글로벌 CDN, Git �
 - React
 - Figma
 - Postman
+- Vercel
   
 *버전 관리*
 
